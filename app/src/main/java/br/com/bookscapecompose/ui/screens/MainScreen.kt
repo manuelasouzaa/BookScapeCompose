@@ -24,9 +24,12 @@ import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.ui.components.BookItem
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainActivityViewModel,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +53,12 @@ fun MainScreen() {
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        BookScapeTextField(Modifier.fillMaxWidth(), "", {})
+        BookScapeTextField(
+            modifier = Modifier.fillMaxWidth(),
+            searchText = "percy",
+            onSearchChange = {},
+            viewModel = viewModel
+        )
 
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -69,5 +77,5 @@ fun MainScreen() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(MainActivityViewModel())
 }

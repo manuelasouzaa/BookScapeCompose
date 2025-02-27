@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.bookscapecompose.ui.screens.MainScreen
 import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
+import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ fun App() {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            MainScreen()
+            MainScreen(MainActivityViewModel())
         }
     }
 }

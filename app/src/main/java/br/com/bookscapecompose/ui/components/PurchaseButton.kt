@@ -15,13 +15,15 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun PurchaseButton(
-    onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.onSecondaryContainer
-        )
+        ),
+        modifier = modifier,
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,

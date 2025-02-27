@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.androidx.material)
     implementation(libs.androidx.runtime.livedata)
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

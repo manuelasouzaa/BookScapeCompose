@@ -1,6 +1,5 @@
 package br.com.bookscapecompose.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,14 +24,18 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.sampledata.book1
+import coil3.compose.AsyncImage
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun BookItem(modifier: Modifier = Modifier) {
+fun BookItem(
+    modifier: Modifier = Modifier,
+    book: Book
+) {
     Row(
         modifier
             .fillMaxWidth()
@@ -41,14 +44,16 @@ fun BookItem(modifier: Modifier = Modifier) {
             .background(MaterialTheme.colorScheme.primary)
             .padding(0.dp),
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
+        AsyncImage(
+            model = book.image,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth(.32f)
                 .fillMaxHeight()
-                .padding(12.dp)
+                .padding(12.dp),
+            placeholder = painterResource(R.drawable.no_image),
+            error = painterResource(R.drawable.no_image),
+            contentScale = ContentScale.Crop,
         )
 
         Column (
@@ -63,8 +68,8 @@ fun BookItem(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             ){
                 Text(
-                    text = LoremIpsum(50).values.first(),
-                    fontSize = 24.sp,
+                    text = book.title,
+                    fontSize = 21.sp,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
@@ -79,7 +84,7 @@ fun BookItem(modifier: Modifier = Modifier) {
                 )
             }
             Text(
-                text = LoremIpsum(50).values.first(),
+                text = book.authors.orEmpty(),
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onTertiary,
                 modifier = Modifier.padding(top = 10.dp),
@@ -88,4 +93,10 @@ fun BookItem(modifier: Modifier = Modifier) {
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun BookItemPreview(modifier: Modifier = Modifier) {
+    BookItem(book = book1)
 }

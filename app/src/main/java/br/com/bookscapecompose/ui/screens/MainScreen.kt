@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.sampledata.book1
 import br.com.bookscapecompose.ui.components.BookItem
 import br.com.bookscapecompose.ui.components.BookScapeTextField
 import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
@@ -64,12 +65,15 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            BookItem(Modifier.fillMaxWidth())
-            BookItem(Modifier.fillMaxWidth())
-            BookItem(Modifier.fillMaxWidth())
-            BookItem(Modifier.fillMaxWidth())
-            BookItem(Modifier.fillMaxWidth())
-            BookItem(Modifier.fillMaxWidth())
+            runCatching {
+                BookItem(Modifier.fillMaxWidth(), book1)
+            }
+//            BookItem(Modifier.fillMaxWidth(), book1)
+//            BookItem(Modifier.fillMaxWidth(), book1)
+//            BookItem(Modifier.fillMaxWidth(), book1)
+//            BookItem(Modifier.fillMaxWidth(), book1)
+//            BookItem(Modifier.fillMaxWidth(), book1)
+//            BookItem(Modifier.fillMaxWidth(), book1)
         }
     }
 }

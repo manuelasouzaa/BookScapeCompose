@@ -2,16 +2,15 @@ package br.com.bookscapecompose.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.ui.components.BookItem
+import br.com.bookscapecompose.ui.components.BookScapeTextField
 
 @Composable
 fun MainScreen() {
@@ -30,7 +31,8 @@ fun MainScreen() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -45,28 +47,22 @@ fun MainScreen() {
             fontFamily = FontFamily(
                 listOf(Font(R.font.kavoon))
             ),
+            color = MaterialTheme.colorScheme.onBackground
         )
-        TextField(
-            value = "",
-            onValueChange = {
 
-            },
-            label = {
-                Text(
-                    text = "Search a book or an author"
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-//            colors = TextFieldColors(
-//
-//            ),
-        )
+        BookScapeTextField(Modifier.fillMaxWidth(), "", {})
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            BookItem(Modifier.fillMaxWidth())
+            BookItem(Modifier.fillMaxWidth())
+            BookItem(Modifier.fillMaxWidth())
+            BookItem(Modifier.fillMaxWidth())
+            BookItem(Modifier.fillMaxWidth())
+            BookItem(Modifier.fillMaxWidth())
+        }
     }
 }
 

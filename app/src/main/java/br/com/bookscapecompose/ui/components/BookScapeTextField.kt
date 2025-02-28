@@ -1,6 +1,5 @@
 package br.com.bookscapecompose.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,15 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
-import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun BookScapeTextField(
     modifier: Modifier = Modifier,
     searchText: String,
     onSearchChange: (String) -> Unit,
-    viewModel: MainActivityViewModel
+    onClick: () -> Unit
 ) {
     TextField(
         value = searchText,
@@ -41,10 +38,7 @@ fun BookScapeTextField(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 modifier = Modifier.clickable {
-                    runBlocking {
-                        val answer = viewModel.searchBooks(searchText)
-                        Log.i("TESTE", "BookScapeTextField: $answer")
-                    }
+                    onClick()
                 }
             )
         },

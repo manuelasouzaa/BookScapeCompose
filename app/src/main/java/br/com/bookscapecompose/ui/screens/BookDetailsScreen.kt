@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.book1
-import br.com.bookscapecompose.ui.components.PurchaseButton
+import br.com.bookscapecompose.ui.components.PersonalizedButton
 import coil3.compose.AsyncImage
 
 @Composable
@@ -116,7 +117,7 @@ fun BookDetailsScreen(
                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
             )
 
-            PurchaseButton(
+            PersonalizedButton(
                 modifier = Modifier.padding(20.dp),
                 onClick = {
                     val intent = Intent(
@@ -124,7 +125,9 @@ fun BookDetailsScreen(
                         Uri.parse(bookLink)
                     )
                     context.startActivity(intent)
-                }
+                },
+                text = "Purchase",
+                imageVector = Icons.Default.ShoppingCart
             )
         }
     }

@@ -10,3 +10,7 @@ val book1: Book = Book(
     image = "http://books.google.com/books/content?id=V6A0zgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
     link = ""
 )
+
+val sampleList: List<Book> = listOf(
+    book1, book1, book1, book1, book1, book1, book1, book1,
+)

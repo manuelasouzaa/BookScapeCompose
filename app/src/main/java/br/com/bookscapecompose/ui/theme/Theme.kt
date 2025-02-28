@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = DarkBlueLightTheme,
     onSecondary = LighterBlueLightTheme,
     tertiary = MediumBlueLightTheme,
-    onTertiary = PetroleumBlueDarkTheme,
+    onTertiary = Black,
     error = DarkRed
 )
 

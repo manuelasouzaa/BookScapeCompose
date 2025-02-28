@@ -22,10 +22,13 @@ import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookItem
+import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
 
 @Composable
 fun SearchScreen(
+    viewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
+    list: List<Book?>,
 ) {
     Column(
         modifier = modifier
@@ -46,9 +49,8 @@ fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            val books: List<Book> = sampleList
-            items(books) { book ->
-                BookItem(book = book)
+            items(list) { book ->
+                book?.let { BookItem(book = it) }
             }
         }
     }
@@ -57,5 +59,9 @@ fun SearchScreen(
 @Preview
 @Composable
 private fun SearchScreenPreview() {
-    SearchScreen()
+    SearchScreen(
+        MainActivityViewModel(),
+        Modifier,
+        sampleList
+    )
 }

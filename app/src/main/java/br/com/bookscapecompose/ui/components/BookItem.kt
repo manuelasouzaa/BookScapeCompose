@@ -34,7 +34,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun BookItem(
     modifier: Modifier = Modifier,
-    book: Book
+    book: Book,
 ) {
     Row(
         modifier
@@ -56,17 +56,17 @@ fun BookItem(
             contentScale = ContentScale.Crop,
         )
 
-        Column (
+        Column(
             Modifier
                 .fillMaxHeight()
                 .padding(12.dp),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Text(
                     text = book.title,
                     fontSize = 21.sp,

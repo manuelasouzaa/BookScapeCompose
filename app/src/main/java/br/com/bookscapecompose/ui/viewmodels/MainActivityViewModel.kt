@@ -38,8 +38,6 @@ class MainActivityViewModel : ViewModel() {
         val answer = service.getBooks(search = searchText)
         val bookList = verifyAnswer(answer)
 
-        //TODO: to verify if the list is null
-
         bookList?.let { _booklist.emit(bookList) }
     }
 

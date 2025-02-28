@@ -45,7 +45,7 @@ fun BookItem(
             .padding(0.dp),
     ) {
         AsyncImage(
-            model = book.image,
+            model = book.image ?: "",
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth(.32f)

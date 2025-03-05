@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,23 +26,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
-import br.com.bookscapecompose.extensions.goToActivity
-import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.ui.activities.SearchActivity
 import br.com.bookscapecompose.ui.components.BookScapeTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
-import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
-import kotlinx.coroutines.flow.first
+import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
-import java.io.Serializable
 
 @Composable
 fun MainScreen(
-    viewModel: MainActivityViewModel,
+    viewModel: SharedViewModel,
+    navController: NavController,
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,10 +77,10 @@ fun MainScreen(
             onClick = {
                 runBlocking {
                     viewModel.searchBooks(state.searchText)
-                    val answer: List<Book?> = viewModel.bookList.first()
-                    goToActivity(context, SearchActivity::class.java) {
-                        putExtra("bookList", answer as Serializable)
-                    }
+                    if (viewModel.bookList.value.isEmpty())
+                        Toast.makeText(context, "Erro ao pesquisar", Toast.LENGTH_SHORT).show()
+                    if (viewModel.bookList.value.isNotEmpty())
+                        navController.navigate("SearchScreen")
                 }
             }
         )
@@ -104,5 +104,5 @@ fun MainScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MainScreenPreview() {
-    MainScreen(MainActivityViewModel())
+    MainScreen(SharedViewModel(), rememberNavController())
 }

@@ -5,18 +5,25 @@ import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.ui.uistate.MainScreenUiState
 import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
-class MainActivityViewModel : ViewModel() {
+class SharedViewModel : ViewModel() {
 
     private val _uiState: MutableStateFlow<MainScreenUiState> =
         MutableStateFlow(MainScreenUiState())
     val uiState get() = _uiState.asStateFlow()
 
-    private val _booklist: MutableStateFlow<List<Book?>> = MutableStateFlow(emptyList())
+    private val _booklist: MutableStateFlow<List<Book?>> =
+        MutableStateFlow(emptyList())
     val bookList = _booklist.asStateFlow()
+
+    private val _clickedBook: MutableStateFlow<Book?> =
+        MutableStateFlow(null)
+    val clickedBook = _clickedBook.asStateFlow()
 
     private val service by lazy {
         RetrofitInstance.api
@@ -35,12 +42,22 @@ class MainActivityViewModel : ViewModel() {
     }
 
     suspend fun searchBooks(searchText: String) {
-        val answer = service.getBooks(search = searchText)
-        val bookList = verifyAnswer(answer)
+        withContext(IO) {
+            val answer = service.getBooks(search = searchText)
 
-        bookList?.let { _booklist.emit(bookList) }
+            val bookList = verifyAnswer(answer)
+
+            when {
+                bookList.isNullOrEmpty() -> {
+                    _booklist.update { emptyList() }
+                    cleanTextField()
+                }
+
+                bookList.isNotEmpty() ->
+                    _booklist.emit(bookList)
+            }
+        }
     }
-
 
     private fun verifyAnswer(answer: GoogleApiAnswer): List<Book?>? {
         return when {
@@ -69,5 +86,17 @@ class MainActivityViewModel : ViewModel() {
                 book
             }
         }
+    }
+
+    fun cleanTextField() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                searchText = ""
+            )
+        }
+    }
+
+    suspend fun sendBook(book: Book) {
+        _clickedBook.emit(book)
     }
 }

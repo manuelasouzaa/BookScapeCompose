@@ -1,8 +1,7 @@
 package br.com.bookscapecompose.ui.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,41 +32,57 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
-import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.sampledata.book1
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun BookDetailsScreen(
-    modifier: Modifier = Modifier,
-    book: Book,
+    viewModel: SharedViewModel,
+    navController: NavController,
 ) {
-    val bookTitle: String = book.title
-    val bookAuthors: String = book.authors ?: ""
-    val bookDesc: String = book.description ?: ""
-    val bookImage: String = book.image ?: ""
-    val bookLink: String = book.link
-    val context = LocalContext.current
+    var bookTitle = ""
+    var bookAuthors = ""
+    var bookDesc = ""
+    var bookImage = ""
+    var bookLink = ""
+
+    runBlocking {
+        viewModel.clickedBook.value?.let { book ->
+            bookTitle = book.title
+            bookAuthors = book.authors ?: ""
+            bookDesc = book.description ?: ""
+            bookImage = book.image ?: ""
+            bookLink = book.link
+        } ?: navController.navigate("MainScreen")
+    }
+
+    val uriHandler = LocalUriHandler.current
 
     Column(
-        modifier
+        Modifier
             .fillMaxSize()
             .padding(16.dp)
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState()),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        navController.navigate("SearchScreen")
+                    },
             )
 
             AsyncImage(
@@ -76,7 +92,8 @@ fun BookDetailsScreen(
                 modifier = Modifier
                     .height(250.dp)
                     .fillMaxWidth(.5f)
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .shadow(6.dp),
                 placeholder = painterResource(R.drawable.no_image),
                 error = painterResource(R.drawable.no_image),
             )
@@ -85,7 +102,11 @@ fun BookDetailsScreen(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_add),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+
+                    },
             )
         }
 
@@ -114,17 +135,18 @@ fun BookDetailsScreen(
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onTertiary,
                 textAlign = TextAlign.Justify,
-                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
+                modifier = Modifier.padding(
+                    top = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 20.dp
+                )
             )
 
             PersonalizedButton(
                 modifier = Modifier.padding(20.dp),
                 onClick = {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(bookLink)
-                    )
-                    context.startActivity(intent)
+                    uriHandler.openUri(bookLink)
                 },
                 text = "Purchase",
                 imageVector = Icons.Default.ShoppingCart
@@ -136,5 +158,5 @@ fun BookDetailsScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun BookDetailsScreenPreview() {
-    BookDetailsScreen(book = book1)
+    BookDetailsScreen(SharedViewModel(), rememberNavController())
 }

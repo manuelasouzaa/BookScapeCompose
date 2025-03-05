@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import br.com.bookscapecompose.ui.screens.MainScreen
+import androidx.navigation.compose.rememberNavController
+import br.com.bookscapecompose.ui.navigation.BookScapeNavHost
 import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
-import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,27 +19,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BookScapeComposeTheme {
-                App()
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Box(
+                        Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    ) {
+                        val navController = rememberNavController()
+
+                        BookScapeNavHost(navController)
+                    }
+                }
             }
         }
     }
-}
-
-@Composable
-fun App() {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Box(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            MainScreen(viewModel = MainActivityViewModel())
-        }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AppPreview() {
-    App()
 }

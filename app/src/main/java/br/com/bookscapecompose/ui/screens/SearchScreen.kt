@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,20 +19,30 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookItem
-import br.com.bookscapecompose.ui.viewmodels.MainActivityViewModel
+import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SearchScreen(
-    viewModel: MainActivityViewModel,
-    modifier: Modifier = Modifier,
-    list: List<Book?>,
+    viewModel: SharedViewModel,
+    navController: NavController,
 ) {
+    val list: List<Book?> = runBlocking { viewModel.bookList.first() }
+
+    BackHandler {
+        navController.navigate("MainScreen")
+    }
+
+    viewModel.cleanTextField()
+
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .background(MaterialTheme.colorScheme.background),
@@ -49,19 +60,24 @@ fun SearchScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(list) { book ->
-                book?.let { BookItem(book = it) }
+            items(list) { bookItem ->
+                bookItem?.let { book ->
+                    BookItem(book = book, onClick = {
+                        runBlocking {
+                            viewModel.sendBook(book)
+                        }
+                        navController.navigate("BookDetailsScreen")
+                    })
+                }
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SearchScreenPreview() {
     SearchScreen(
-        MainActivityViewModel(),
-        Modifier,
-        sampleList
+        SharedViewModel(), rememberNavController()
     )
 }

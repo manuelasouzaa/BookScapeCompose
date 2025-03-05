@@ -1,6 +1,8 @@
 package br.com.bookscapecompose.ui.components
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -13,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview(showBackground = true)
 @Composable
 fun PersonalizedButton(
     modifier: Modifier = Modifier,
@@ -41,4 +42,10 @@ fun PersonalizedButton(
             modifier = Modifier.padding(5.dp)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PresonalizedButtonPreview() {
+    PersonalizedButton(Modifier, {}, "Preview", Icons.Default.Done)
 }

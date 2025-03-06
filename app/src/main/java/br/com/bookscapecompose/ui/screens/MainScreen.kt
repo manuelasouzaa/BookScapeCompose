@@ -76,11 +76,16 @@ fun MainScreen(
             onSearchChange = state.onSearchChange,
             onClick = {
                 runBlocking {
-                    viewModel.searchBooks(state.searchText)
-                    if (viewModel.bookList.value.isEmpty())
-                        Toast.makeText(context, "Erro ao pesquisar", Toast.LENGTH_SHORT).show()
-                    if (viewModel.bookList.value.isNotEmpty())
-                        navController.navigate("SearchScreen")
+                    state.searchText.let {
+                        if (it.isNotEmpty()) {
+                            viewModel.searchBooks(state.searchText)
+                            if (viewModel.bookList.value.isEmpty())
+                                Toast.makeText(context, "Livro não encontrado", Toast.LENGTH_SHORT)
+                                    .show()
+                            if (viewModel.bookList.value.isNotEmpty())
+                                navController.navigate("SearchScreen")
+                        }
+                    }
                 }
             }
         )

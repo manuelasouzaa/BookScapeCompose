@@ -1,6 +1,10 @@
 package br.com.bookscapecompose.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -12,22 +16,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BookScapeTextField(
-    value: String,
-    onValueChange: () -> Unit,
-    label: String,
+fun BookScapeIconTextField(
     modifier: Modifier = Modifier,
-    keyboardType: KeyboardType,
+    searchText: String,
+    onSearchChange: (String) -> Unit,
+    onClick: () -> Unit,
 ) {
     TextField(
-        value = value,
+        value = searchText,
         onValueChange = {
-            onValueChange()
+            onSearchChange(it)
         },
         label = {
             Text(
-                text = label,
+                text = "Search a book or an author",
                 fontSize = 16.sp
+            )
+        },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                modifier = Modifier.clickable {
+                    onClick()
+                }
             )
         },
         modifier = modifier,
@@ -45,6 +57,6 @@ fun BookScapeTextField(
         textStyle = TextStyle(
             fontSize = 20.sp
         ),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
     )
 }

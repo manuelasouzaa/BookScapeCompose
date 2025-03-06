@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
-import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
@@ -70,7 +70,7 @@ fun MainScreen(
             )
         }
 
-        BookScapeTextField(
+        BookScapeIconTextField(
             modifier = Modifier.fillMaxWidth(),
             searchText = state.searchText,
             onSearchChange = state.onSearchChange,

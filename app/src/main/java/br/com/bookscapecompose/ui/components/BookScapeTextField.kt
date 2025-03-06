@@ -9,20 +9,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun BookScapeTextField(
     value: String,
-    onValueChange: () -> Unit,
+    onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
     keyboardType: KeyboardType,
+    isPassword: Boolean,
 ) {
     TextField(
         value = value,
         onValueChange = {
-            onValueChange()
+            onValueChange(it)
         },
         label = {
             Text(
@@ -46,5 +49,6 @@ fun BookScapeTextField(
             fontSize = 20.sp
         ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
     )
 }

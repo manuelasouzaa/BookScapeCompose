@@ -13,8 +13,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -27,14 +30,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
-import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
+import br.com.bookscapecompose.ui.viewmodels.SignInMessage
+import br.com.bookscapecompose.ui.viewmodels.SignInViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SignInScreen(
-    viewModel: SignUpViewModel,
+    viewModel: SignInViewModel,
     navController: NavController,
 ) {
+    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -76,26 +85,42 @@ fun SignInScreen(
                 color = MaterialTheme.colorScheme.secondary
             )
             BookScapeTextField(
-                value = "",
-                onValueChange = {
-
-                },
+                value = state.email,
+                onValueChange = state.onEmailChange,
                 label = "E-mail",
                 modifier = Modifier.fillMaxWidth(.9f),
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Email,
+                isPassword = false
             )
             BookScapeTextField(
-                value = "",
-                onValueChange = {
-
-                },
+                value = state.password,
+                onValueChange = state.onPasswordChange,
                 label = "Password",
                 modifier = Modifier.fillMaxWidth(.9f),
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Password,
+                isPassword = true
             )
             Button(
                 onClick = {
-                    //TODO: authentication function
+                    runBlocking {
+                        val message = viewModel.authenticate(context, state.email, state.password)
+                        when (message) {
+                            SignInMessage.Initial -> {}
+                            SignInMessage.MissingInformation ->
+                                toast(context, "Preencha todos os campos!")
+
+                            SignInMessage.WrongPassword ->
+                                toast(context, "Senha incorreta!")
+
+                            SignInMessage.UserDoesNotExist ->
+                                toast(context, "Usuário não encontrado. Faça cadastro!")
+
+                            SignInMessage.UserLoggedIn -> {
+                                toast(context, "Login realizado com sucesso!")
+                                navController.navigate("MainScreen")
+                            }
+                        }
+                    }
                 },
                 content = {
                     Text(
@@ -118,7 +143,7 @@ fun SignInScreen(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
                         .clickable {
-                            //TODO: go to sign up screen
+                            navController.navigate("SignUpScreen")
                         }
                 )
             }
@@ -129,5 +154,5 @@ fun SignInScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SignInScreenPreview() {
-    SignInScreen(SignUpViewModel(), rememberNavController())
+    SignInScreen(SignInViewModel(), rememberNavController())
 }

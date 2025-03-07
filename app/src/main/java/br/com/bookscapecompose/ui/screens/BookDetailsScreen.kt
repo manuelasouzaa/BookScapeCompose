@@ -20,6 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -38,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.runBlocking
@@ -55,18 +59,34 @@ fun BookDetailsScreen(
 
     val context = LocalContext.current
 
+    val bookMessage = viewModel.bookMessage.collectAsState()
+
+    val icon = if (bookMessage.value == BookMessage.AddedBook)
+        R.drawable.ic_added
+    else
+        R.drawable.ic_add
+
     BackHandler {
         navController.navigateUp()
     }
 
     runBlocking {
-        viewModel.clickedBook.value?.let { book ->
-            bookTitle = book.title
-            bookAuthors = book.authors ?: ""
-            bookDesc = book.description ?: ""
-            bookImage = book.image ?: ""
-            bookLink = book.link
+        val answer = viewModel.verifyClickedBook(context)
+        answer?.let {
+            bookTitle = it.title
+            bookAuthors = it.authors ?: ""
+            bookDesc = it.description ?: ""
+            bookImage = it.image ?: ""
+            bookLink = it.link
         } ?: navController.navigate("MainScreen")
+
+//        viewModel.clickedBook.value?.let { book ->
+//            bookTitle = book.title
+//            bookAuthors = book.authors ?: ""
+//            bookDesc = book.description ?: ""
+//            bookImage = book.image ?: ""
+//            bookLink = book.link
+//        } ?: navController.navigate("MainScreen")
     }
 
     val uriHandler = LocalUriHandler.current
@@ -107,7 +127,7 @@ fun BookDetailsScreen(
             )
 
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_add),
+                imageVector = ImageVector.vectorResource(icon),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier

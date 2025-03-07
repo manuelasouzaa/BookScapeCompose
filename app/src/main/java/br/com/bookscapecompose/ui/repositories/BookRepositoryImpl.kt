@@ -54,7 +54,8 @@ class BookRepositoryImpl : BookRepository {
         return doesBookExist
     }
 
-    override fun saveBook(context: Context, book: Book, userEmail: String) {
+    override fun saveBook(context: Context, book: Book, userEmail: String): Boolean {
+        var isBookSaved = false
         val dao = database.getDatabaseInstance(context).SavedBookDao()
         val savedBook = SavedBook(
             savedBookId = UUID.randomUUID().toString(),
@@ -65,7 +66,13 @@ class BookRepositoryImpl : BookRepository {
             bookImage = book.image ?: "",
             bookApiId = book.id
         )
-        dao.saveBook(savedBook)
+        try {
+            dao.saveBook(savedBook)
+            isBookSaved = true
+        } catch (e: Exception) {
+            isBookSaved = false
+        }
+        return isBookSaved
     }
 
     override fun showBooks(context: Context, userEmail: String): List<SavedBook?> {

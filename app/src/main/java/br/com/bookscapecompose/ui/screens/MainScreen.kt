@@ -80,7 +80,7 @@ fun MainScreen(
                         if (it.isNotEmpty()) {
                             viewModel.searchBooks(state.searchText)
                             if (viewModel.bookList.value.isEmpty())
-                                Toast.makeText(context, "Livro não encontrado", Toast.LENGTH_SHORT)
+                                Toast.makeText(context, "Book not found", Toast.LENGTH_SHORT)
                                     .show()
                             if (viewModel.bookList.value.isNotEmpty())
                                 navController.navigate("SearchScreen")
@@ -99,7 +99,9 @@ fun MainScreen(
 
         PersonalizedButton(
             modifier = Modifier,
-            onClick = {},
+            onClick = {
+                navController.navigate("AccountScreen")
+            },
             text = "My Account",
             imageVector = Icons.Default.AccountCircle
         )

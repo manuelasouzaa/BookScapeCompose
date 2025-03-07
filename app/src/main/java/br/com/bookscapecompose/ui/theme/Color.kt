@@ -17,7 +17,7 @@ val DarkBlueDarkTheme = Color(0xFF072338)
 
 val LighterBlueLightTheme = Color(0xFFA4D4F5)
 val MediumBlueLightTheme = Color(0xFF5890B2)
-val PetroleumLightTheme = Color(0xFF52859D)
+val PetroleumLightTheme = Color(0xFF5A90A9)
 val DarkBlueLightTheme = Color(0xFF1A384F)
 
 val DarkRed = Color(0xFF57070E)

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import br.com.bookscapecompose.ui.screens.AccountScreen
 import br.com.bookscapecompose.ui.screens.BookDetailsScreen
 import br.com.bookscapecompose.ui.screens.MainScreen
 import br.com.bookscapecompose.ui.screens.SearchScreen
@@ -19,7 +20,7 @@ fun BookScapeNavHost(navController: NavHostController) {
     val signInViewModel = SignInViewModel()
     val sharedViewModel = SharedViewModel()
 
-    NavHost(navController = navController, startDestination = "SignUpScreen") {
+    NavHost(navController = navController, startDestination = "MainScreen") {
         composable("SignUpScreen") {
             SignUpScreen(signUpViewModel, navController)
         }
@@ -34,6 +35,9 @@ fun BookScapeNavHost(navController: NavHostController) {
         }
         composable("BookDetailsScreen") {
             BookDetailsScreen(sharedViewModel, navController)
+        }
+        composable("AccountScreen") {
+            AccountScreen(navController)
         }
     }
 }

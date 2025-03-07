@@ -4,24 +4,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,89 +44,136 @@ fun AccountScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.5f)
+                .fillMaxHeight(.25f)
                 .background(MaterialTheme.colorScheme.primary),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.Top,
         ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(top = 20.dp, start = 16.dp)
+                    .clickable {
+                        navController.navigate("MainScreen")
+                    }
+            )
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(.95f),
-                horizontalArrangement = Arrangement.Start
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(3.dp)
+                .background(MaterialTheme.colorScheme.tertiary)
+        )
+
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = null,
+            modifier = Modifier
+                .offset(y = (-100).dp)
+                .size(180.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.tertiary)
+                .scale(1.15f),
+            tint = MaterialTheme.colorScheme.onSecondary,
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .offset(y = (-80).dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                Text(
+                    text = "Username",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(16.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(
                     modifier = Modifier
-                        .size(50.dp)
-                        .clickable {
-                            navController.navigate("MainScreen")
-                        }
+                        .fillMaxWidth(.35f)
+                        .height(2.dp)
+                        .background(MaterialTheme.colorScheme.secondary)
                 )
             }
 
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.size(190.dp),
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "E-mail",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(top = 50.dp, bottom = 5.dp)
+                )
 
-            Text(
-                text = "Username",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 26.dp),
-            )
-        }
-        Column(
-            modifier = Modifier.padding(30.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.size(20.dp))
+                Text(
+                    text = "E-mail do usuário",
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        bottom = 30.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
-            Text(
-                text = "E-mail",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {
+                        //TODO: click function that goes to the bookListScreen
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(.5f)
+                        .padding(top = 21.dp, bottom = 21.dp),
+                ) {
+                    Text(
+                        text = "My BookList",
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
 
-            Text(
-                text = "E-mail do usuário",
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onTertiary
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-
-            Text(
-                text = "Username",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Text(
-                text = "Username do usuário",
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onTertiary
-            )
-
-            Spacer(modifier = Modifier.size(20.dp))
-
-            PersonalizedButton(
-                modifier = Modifier.fillMaxWidth(.5f),
-                onClick = {},
-                text = "Logout",
-                imageVector = Icons.Default.ExitToApp
-            )
+                PersonalizedButton(
+                    modifier = Modifier
+                        .fillMaxWidth(.5f)
+                        .padding(top = 5.dp),
+                    onClick = {
+                        //TODO: click logout function
+                    },
+                    text = "Logout",
+                    imageVector = Icons.Default.ExitToApp
+                )
+            }
         }
     }
 }

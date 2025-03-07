@@ -121,12 +121,16 @@ fun SignUpScreen(
 
                         when (message) {
                             SignUpMessage.Initial -> {}
+
                             SignUpMessage.Error ->
                                 toast(context, "An error occurred. Please try again")
+
                             SignUpMessage.MissingInformation ->
                                 toast(context, "Please, complete the missing fields!")
+
                             SignUpMessage.UserIsAlreadyAdded ->
-                                toast(context, "You’ve already signed up. Try logging in instead")
+                                toast(context, "You're already signed up. Please log in")
+
                             SignUpMessage.UserSuccessfullyAdded -> {
                                 toast(context, "User added successfully!")
                                 navController.navigate("SignInScreen")

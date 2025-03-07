@@ -20,7 +20,7 @@ class SignInViewModel : ViewModel() {
 
     private val _signInMessage: MutableStateFlow<SignInMessage> =
         MutableStateFlow(SignInMessage.Initial)
-    val message = _signInMessage.asStateFlow()
+    private val message = _signInMessage.asStateFlow()
 
     init {
         _uiState.update { currentState ->
@@ -52,7 +52,11 @@ class SignInViewModel : ViewModel() {
                         _signInMessage.emit(SignInMessage.UserDoesNotExist)
 
                     if (verification) {
-                        auth(context, email, password)
+                        try {
+                            auth(context, email, password)
+                        } catch (e: Exception) {
+                            _signInMessage.emit(SignInMessage.Error)
+                        }
                     }
                 }
 
@@ -94,4 +98,5 @@ sealed class SignInMessage {
     data object WrongPassword : SignInMessage()
     data object MissingInformation : SignInMessage()
     data object UserLoggedIn : SignInMessage()
+    data object Error : SignInMessage()
 }

@@ -45,8 +45,13 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    suspend fun addNewUser(context: Context, email: String, username: String, password: String): SignUpMessage {
-        withContext(IO){
+    suspend fun addNewUser(
+        context: Context,
+        email: String,
+        username: String,
+        password: String,
+    ): SignUpMessage {
+        withContext(IO) {
             try {
                 when {
                     email.isEmpty() || username.isEmpty() || password.isEmpty() ->

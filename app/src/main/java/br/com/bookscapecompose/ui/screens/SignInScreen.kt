@@ -106,17 +106,21 @@ fun SignInScreen(
                         val message = viewModel.authenticate(context, state.email, state.password)
                         when (message) {
                             SignInMessage.Initial -> {}
+
+                            SignInMessage.Error ->
+                                toast(context, "An error occurred. Please try again")
+
                             SignInMessage.MissingInformation ->
-                                toast(context, "Preencha todos os campos!")
+                                toast(context, "Please complete the missing fields")
 
                             SignInMessage.WrongPassword ->
-                                toast(context, "Senha incorreta!")
+                                toast(context, "Incorrect password. Please try again!")
 
                             SignInMessage.UserDoesNotExist ->
-                                toast(context, "Usuário não encontrado. Faça cadastro!")
+                                toast(context, "User not found. Please sign up")
 
                             SignInMessage.UserLoggedIn -> {
-                                toast(context, "Login realizado com sucesso!")
+                                toast(context, "Logged in successfully!")
                                 navController.navigate("MainScreen")
                             }
                         }

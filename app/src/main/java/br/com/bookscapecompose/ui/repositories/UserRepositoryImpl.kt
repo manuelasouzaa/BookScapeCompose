@@ -8,7 +8,7 @@ class UserRepositoryImpl : UserRepository {
 
     private val database = BookScapeDatabase
 
-    fun addUser(context: Context, user: User) {
+    override fun addUser(context: Context, user: User) {
         val dao = database.getDatabaseInstance(context).UserDao()
         dao.saveUser(user)
     }

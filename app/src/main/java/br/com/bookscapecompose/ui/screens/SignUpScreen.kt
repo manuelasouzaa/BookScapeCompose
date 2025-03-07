@@ -13,8 +13,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -27,14 +30,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.viewmodels.SignUpMessage
 import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel,
     navController: NavController,
 ) {
+    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -77,35 +86,53 @@ fun SignUpScreen(
 
             )
             BookScapeTextField(
-                value = "",
-                onValueChange = {
-
-                },
+                value = state.email,
+                onValueChange = state.onEmailChange,
                 label = "E-mail",
                 modifier = Modifier.fillMaxWidth(.9f),
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Email,
+                isPassword = false
             )
             BookScapeTextField(
-                value = "",
-                onValueChange = {
-
-                },
+                value = state.username,
+                onValueChange = state.onUsernameChange,
                 label = "Username",
                 modifier = Modifier.fillMaxWidth(.9f),
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                isPassword = false
             )
             BookScapeTextField(
-                value = "",
-                onValueChange = {
-
-                },
+                value = state.password,
+                onValueChange = state.onPasswordChange,
                 label = "Password",
                 modifier = Modifier.fillMaxWidth(.9f),
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Password,
+                isPassword = true
             )
             Button(
                 onClick = {
-                    //TODO: sign up function
+                    runBlocking {
+                        val message = viewModel.addNewUser(
+                            context = context,
+                            email = state.email,
+                            username = state.username,
+                            password = state.password
+                        )
+
+                        when (message) {
+                            SignUpMessage.Initial -> {}
+                            SignUpMessage.Error ->
+                                toast(context, "An error occurred. Please try again")
+                            SignUpMessage.MissingInformation ->
+                                toast(context, "Please, complete the missing fields!")
+                            SignUpMessage.UserIsAlreadyAdded ->
+                                toast(context, "You’ve already signed up. Try logging in instead")
+                            SignUpMessage.UserSuccessfullyAdded -> {
+                                toast(context, "User added successfully!")
+                                navController.navigate("SignInScreen")
+                            }
+                        }
+                    }
                 },
                 content = {
                     Text(
@@ -128,7 +155,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
                         .clickable {
-                            //TODO: go to sign in screen
+                            navController.navigate("SignInScreen")
                         }
                 )
             }

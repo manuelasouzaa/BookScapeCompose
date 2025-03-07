@@ -68,7 +68,6 @@ class SignUpViewModel : ViewModel() {
                             repository.addUser(context, user)
                             _signUpMessage.emit(SignUpMessage.UserSuccessfullyAdded)
                         }
-
                     }
                 }
             } catch (e: Exception) {

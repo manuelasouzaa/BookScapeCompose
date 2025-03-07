@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -51,6 +52,8 @@ fun BookDetailsScreen(
     var bookDesc = ""
     var bookImage = ""
     var bookLink = ""
+
+    val context = LocalContext.current
 
     BackHandler {
         navController.navigateUp()
@@ -110,7 +113,7 @@ fun BookDetailsScreen(
                 modifier = Modifier
                     .size(50.dp)
                     .clickable {
-
+                        runBlocking { viewModel.saveBook(context) }
                     },
             )
         }

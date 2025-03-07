@@ -4,11 +4,45 @@ import android.content.Context
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
+import br.com.bookscapecompose.web.json.GoogleApiAnswer
+import br.com.bookscapecompose.web.retrofit.RetrofitInstance
 import java.util.UUID
 
 class BookRepositoryImpl : BookRepository {
 
     private val database = BookScapeDatabase
+
+    private val service by lazy { RetrofitInstance.api }
+
+    override suspend fun verifyApiAnswer(searchText: String): List<Book?>? {
+        val answer = service.getBooks(searchText)
+        return when {
+            answer.totalItems == 0 ->
+                null
+
+            answer.totalItems > 0 ->
+                getList(answer)
+
+            else ->
+                null
+        }
+    }
+
+    private fun getList(answer: GoogleApiAnswer): List<Book?> {
+        return answer.items.map { completeBook ->
+            completeBook.volumeInfo?.let {
+                val book = Book(
+                    id = completeBook.id,
+                    title = it.title,
+                    authors = it.authors.toString(),
+                    description = it.description.toString(),
+                    image = it.imageLinks?.thumbnail,
+                    link = it.infoLink.orEmpty()
+                )
+                book
+            }
+        }
+    }
 
     override fun verifyIfBookIsSaved(context: Context, bookId: String): Boolean {
         var doesBookExist = false

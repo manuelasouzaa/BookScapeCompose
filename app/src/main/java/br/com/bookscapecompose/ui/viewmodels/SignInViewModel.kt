@@ -20,6 +20,7 @@ class SignInViewModel : ViewModel() {
 
     private val _signInMessage: MutableStateFlow<SignInMessage> =
         MutableStateFlow(SignInMessage.Initial)
+
     private val message = _signInMessage.asStateFlow()
 
     init {

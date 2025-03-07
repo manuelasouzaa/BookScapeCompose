@@ -1,9 +1,10 @@
 package br.com.bookscapecompose.ui.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.ui.repositories.BookRepositoryImpl
 import br.com.bookscapecompose.ui.uistate.MainScreenUiState
-import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,9 +26,7 @@ class SharedViewModel : ViewModel() {
         MutableStateFlow(null)
     val clickedBook = _clickedBook.asStateFlow()
 
-    private val service by lazy {
-        RetrofitInstance.api
-    }
+    private val repository = BookRepositoryImpl()
 
     init {
         _uiState.update { currentState ->
@@ -43,9 +42,7 @@ class SharedViewModel : ViewModel() {
 
     suspend fun searchBooks(searchText: String) {
         withContext(IO) {
-            val answer = service.getBooks(search = searchText)
-
-            val bookList = verifyAnswer(answer)
+            val bookList = repository.verifyApiAnswer(searchText)
 
             when {
                 bookList.isNullOrEmpty() -> {
@@ -55,35 +52,6 @@ class SharedViewModel : ViewModel() {
 
                 bookList.isNotEmpty() ->
                     _booklist.emit(bookList)
-            }
-        }
-    }
-
-    private fun verifyAnswer(answer: GoogleApiAnswer): List<Book?>? {
-        return when {
-            answer.totalItems == 0 ->
-                null
-
-            answer.totalItems > 0 ->
-                getList(answer)
-
-            else ->
-                null
-        }
-    }
-
-    private fun getList(answer: GoogleApiAnswer): List<Book?> {
-        return answer.items.map { completeBook ->
-            completeBook.volumeInfo?.let {
-                val book = Book(
-                    id = completeBook.id,
-                    title = it.title,
-                    authors = it.authors.toString(),
-                    description = it.description.toString(),
-                    image = it.imageLinks?.thumbnail,
-                    link = it.infoLink.orEmpty()
-                )
-                book
             }
         }
     }
@@ -98,5 +66,14 @@ class SharedViewModel : ViewModel() {
 
     suspend fun sendBook(book: Book) {
         _clickedBook.emit(book)
+    }
+
+    suspend fun saveBook(context: Context) {
+        val userEmail = "teste@gmail.com"
+        clickedBook.value?.let { book ->
+            withContext(IO) {
+                repository.saveBook(context, book, userEmail)
+            }
+        }
     }
 }

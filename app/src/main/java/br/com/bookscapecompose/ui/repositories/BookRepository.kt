@@ -6,6 +6,8 @@ import br.com.bookscapecompose.model.SavedBook
 
 interface BookRepository {
 
+    suspend fun verifyApiAnswer(searchText: String): List<Book?>?
+
     fun verifyIfBookIsSaved(context: Context, bookId: String): Boolean
 
     fun saveBook(context: Context, book: Book, userEmail: String)

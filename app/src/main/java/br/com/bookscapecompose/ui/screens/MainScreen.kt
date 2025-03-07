@@ -1,6 +1,7 @@
 package br.com.bookscapecompose.ui.screens
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,10 @@ fun MainScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    BackHandler {
+        navController.navigateUp()
+    }
 
     Column(
         modifier = Modifier
@@ -92,7 +97,9 @@ fun MainScreen(
 
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
-            onClick = {},
+            onClick = {
+                navController.navigate("BookListScreen")
+            },
             text = "My BookList",
             imageVector = Icons.Default.List
         )

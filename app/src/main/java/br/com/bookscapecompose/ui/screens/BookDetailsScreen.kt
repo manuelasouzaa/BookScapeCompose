@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +52,10 @@ fun BookDetailsScreen(
     var bookImage = ""
     var bookLink = ""
 
+    BackHandler {
+        navController.navigateUp()
+    }
+
     runBlocking {
         viewModel.clickedBook.value?.let { book ->
             bookTitle = book.title
@@ -81,7 +86,7 @@ fun BookDetailsScreen(
                 modifier = Modifier
                     .size(50.dp)
                     .clickable {
-                        navController.navigate("SearchScreen")
+                        navController.navigateUp()
                     },
             )
 

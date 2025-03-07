@@ -34,12 +34,11 @@ fun SearchScreen(
     navController: NavController,
 ) {
     val list: List<Book?> = runBlocking { viewModel.bookList.first() }
+    viewModel.cleanTextField()
 
     BackHandler {
         navController.navigate("MainScreen")
     }
-
-    viewModel.cleanTextField()
 
     Column(
         modifier = Modifier

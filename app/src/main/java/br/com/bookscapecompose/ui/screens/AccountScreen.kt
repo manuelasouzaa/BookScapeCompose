@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,10 @@ import br.com.bookscapecompose.ui.components.PersonalizedButton
 fun AccountScreen(
     navController: NavController,
 ) {
+    BackHandler {
+        navController.navigateUp()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +67,7 @@ fun AccountScreen(
                     .size(80.dp)
                     .padding(top = 20.dp, start = 16.dp)
                     .clickable {
-                        navController.navigate("MainScreen")
+                        navController.navigateUp()
                     }
             )
         }
@@ -146,7 +151,7 @@ fun AccountScreen(
             ) {
                 Button(
                     onClick = {
-                        //TODO: click function that goes to the bookListScreen
+                        navController.navigate("BookListScreen")
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer

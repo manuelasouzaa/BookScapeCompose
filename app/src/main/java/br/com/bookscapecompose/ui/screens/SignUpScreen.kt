@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +44,10 @@ fun SignUpScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+
+    BackHandler {
+        navController.navigateUp()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),

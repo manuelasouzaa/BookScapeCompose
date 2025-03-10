@@ -34,8 +34,8 @@ class BookRepositoryImpl : BookRepository {
                 val book = Book(
                     id = completeBook.id,
                     title = it.title,
-                    authors = it.authors.toString(),
-                    description = it.description.toString(),
+                    authors = it.authors?.toString(),
+                    description = it.description?.toString(),
                     image = it.imageLinks?.thumbnail,
                     link = it.infoLink.orEmpty()
                 )
@@ -55,7 +55,7 @@ class BookRepositoryImpl : BookRepository {
     }
 
     override fun saveBook(context: Context, book: Book, userEmail: String): Boolean {
-        var isBookSaved = false
+        var isBookSaved: Boolean
         val dao = database.getDatabaseInstance(context).SavedBookDao()
         val savedBook = SavedBook(
             savedBookId = UUID.randomUUID().toString(),
@@ -64,7 +64,8 @@ class BookRepositoryImpl : BookRepository {
             bookAuthor = book.authors ?: "",
             bookDescription = book.description ?: "",
             bookImage = book.image ?: "",
-            bookApiId = book.id
+            bookApiId = book.id,
+            bookLink = book.link
         )
         try {
             dao.saveBook(savedBook)
@@ -79,4 +80,5 @@ class BookRepositoryImpl : BookRepository {
         val dao = database.getDatabaseInstance(context).SavedBookDao()
         return dao.showSavedBooks(userEmail)
     }
+
 }

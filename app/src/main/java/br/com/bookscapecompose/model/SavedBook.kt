@@ -30,6 +30,9 @@ class SavedBook(
     val bookImage: String,
 
     @ColumnInfo(name = "bookApiId")
-    val bookApiId: String
+    val bookApiId: String,
+
+    @ColumnInfo(name = "bookLink")
+    val bookLink: String
 
 ): Parcelable

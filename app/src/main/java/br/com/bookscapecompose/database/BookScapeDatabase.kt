@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import br.com.bookscapecompose.database.dao.SavedBookDao
 import br.com.bookscapecompose.database.dao.UserDao
+import br.com.bookscapecompose.migrations.migration1To2
 import br.com.bookscapecompose.model.SavedBook
 import br.com.bookscapecompose.model.User
 
-@Database(entities = [(User::class), (SavedBook::class)], version = 1)
+@Database(entities = [(User::class), (SavedBook::class)], version = 2)
 abstract class BookScapeDatabase : RoomDatabase() {
 
     abstract fun UserDao() : UserDao
@@ -25,7 +26,9 @@ abstract class BookScapeDatabase : RoomDatabase() {
                     context.applicationContext,
                     BookScapeDatabase::class.java,
                     "BookScapeDatabase"
-                ).build().also { INSTANCE = it }
+                )
+                    .addMigrations(migration1To2)
+                    .build().also { INSTANCE = it }
             }
     }
 }

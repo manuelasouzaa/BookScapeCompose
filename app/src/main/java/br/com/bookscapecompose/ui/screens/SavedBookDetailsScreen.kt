@@ -7,14 +7,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
-import br.com.bookscapecompose.expressions.toast
-import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun BookDetailsScreen(
+fun SavedBookDetailsScreen(
     viewModel: SharedViewModel,
     navController: NavController,
 ) {
@@ -24,9 +22,9 @@ fun BookDetailsScreen(
 
     val bookMessage = viewModel.bookMessage.collectAsState()
 
-    val icon =
+    val bookmarkIcon =
         if (bookMessage.value == BookMessage.AddedBook)
-            R.drawable.ic_added
+            R.drawable.ic_remove
         else
             R.drawable.ic_add
 
@@ -41,14 +39,9 @@ fun BookDetailsScreen(
         BookDetails(
             returnClick = { navController.navigateUp() },
             bookImageUrl = answer.image ?: "",
-            bookmarkIcon = icon,
+            bookmarkIcon = bookmarkIcon,
             bookmarkIconClick = {
-                if (icon == R.drawable.ic_add) {
-                    runBlocking { viewModel.saveBook(context) }
-                    //TODO: dialog saying that the book was added successfully and with a button that goes to the bookList
-                }
-                if (icon == R.drawable.ic_added)
-                    toast(context, "This book is already on your list!")
+                //TODO: dialog asking if the user wishes to remove the book from the list
             },
             bookTitle = answer.title,
             bookAuthors = answer.authors ?: "",

@@ -20,9 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -40,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.PersonalizedButton
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
@@ -79,14 +78,6 @@ fun BookDetailsScreen(
             bookImage = it.image ?: ""
             bookLink = it.link
         } ?: navController.navigate("MainScreen")
-
-//        viewModel.clickedBook.value?.let { book ->
-//            bookTitle = book.title
-//            bookAuthors = book.authors ?: ""
-//            bookDesc = book.description ?: ""
-//            bookImage = book.image ?: ""
-//            bookLink = book.link
-//        } ?: navController.navigate("MainScreen")
     }
 
     val uriHandler = LocalUriHandler.current
@@ -133,7 +124,10 @@ fun BookDetailsScreen(
                 modifier = Modifier
                     .size(50.dp)
                     .clickable {
-                        runBlocking { viewModel.saveBook(context) }
+                        if (icon == R.drawable.ic_add)
+                            runBlocking { viewModel.saveBook(context) }
+                        if (icon == R.drawable.ic_added)
+                            toast(context, "This book is already on your list!")
                     },
             )
         }

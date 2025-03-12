@@ -34,9 +34,7 @@ fun BookListScreen(
         isLoading.value = false
     }
 
-    if (isLoading.value) {
-        CircularProgressIndicator()
-    } else {
+    if (!isLoading.value) {
         BookScapeList(
             title = "My BookList",
             list = list.value,
@@ -47,6 +45,8 @@ fun BookListScreen(
                 navController.navigate("SavedBookDetailsScreen")
             }
         )
+    } else {
+        CircularProgressIndicator()
     }
 }
 

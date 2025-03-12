@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 
 data class BookVolumeInfo(
     @SerializedName("title")
-    val title: String,
+    val title: String?,
 
     @SerializedName("subtitle")
     val subtitle: String?,

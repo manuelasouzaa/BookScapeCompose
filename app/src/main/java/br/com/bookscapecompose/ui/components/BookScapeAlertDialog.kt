@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,7 +52,8 @@ fun BookScapeAlertDialog(
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 5.dp),
                 textAlign = TextAlign.Center,
-                fontSize = 20.sp
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
             )
         },
         text = {
@@ -60,7 +62,7 @@ fun BookScapeAlertDialog(
                     text = it,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
+                        .padding(horizontal = 5.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp
                 )

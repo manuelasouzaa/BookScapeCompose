@@ -59,7 +59,7 @@ fun MainScreen(
             ApiAnswer.EmptyList ->
                 toast(context, "Book not found")
 
-            ApiAnswer.BookList -> {
+            ApiAnswer.Success -> {
                 navController.navigate("SearchScreen")
             }
 

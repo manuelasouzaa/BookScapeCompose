@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.model.SavedBook
 import br.com.bookscapecompose.ui.repositories.BookRepositoryImpl
 import br.com.bookscapecompose.ui.uistate.MainScreenUiState
 import kotlinx.coroutines.Dispatchers.IO
@@ -12,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class SharedViewModel : ViewModel() {
@@ -37,6 +37,8 @@ class SharedViewModel : ViewModel() {
     val apiAnswer = _apiAnswer.asStateFlow()
 
     private val repository = BookRepositoryImpl()
+
+    val userEmail = "manuela.souza@gmail.com"
 
     init {
         _uiState.update { currentState ->
@@ -68,13 +70,12 @@ class SharedViewModel : ViewModel() {
             bookList.isNullOrEmpty() -> {
                 _apiAnswer.emit(ApiAnswer.EmptyList)
                 _bookList.update { emptyList() }
-
                 cleanTextField()
             }
 
             bookList.isNotEmpty() -> {
                 _bookList.emit(bookList)
-                _apiAnswer.emit(ApiAnswer.BookList)
+                _apiAnswer.emit(ApiAnswer.Success)
             }
         }
         return apiAnswer.value
@@ -97,82 +98,76 @@ class SharedViewModel : ViewModel() {
     }
 
     fun saveBook(context: Context): BookMessage {
-        val userEmail = "manuela.souza@gmail.com"
         viewModelScope.launch(IO) {
             clickedBook.value?.let { book ->
-                val isBookAlreadySaved = verifyIfBookIsSaved(context, book.id)
+                val verification = verifyIfBookIsSaved(context, book.id)
 
-                when {
-                    isBookAlreadySaved == BookMessage.AddedBook ->
-                        return@launch
+                when (verification) {
+                    BookMessage.AddedBook -> return@launch
 
-                    isBookAlreadySaved != BookMessage.AddedBook -> {
+                    BookMessage.NotSavedBook -> {
                         val isBookSaved = repository.saveBook(context, book, userEmail)
                         if (!isBookSaved)
                             _bookMessage.emit(BookMessage.Error)
                         if (isBookSaved)
                             _bookMessage.emit(BookMessage.AddedBook)
                     }
+
+                    else -> return@launch
                 }
             }
         }
         return bookMessage.value
     }
 
-    fun verifyClickedBook(context: Context): Book? {
-        var bookDetails: Book? = null
-        viewModelScope.launch {
-            clickedBook.value?.let { book ->
-                bookDetails = Book(
-                    id = book.id,
-                    title = book.title,
-                    authors = book.authors ?: "",
-                    description = book.description ?: "",
-                    image = book.image ?: "",
-                    link = book.link
-                )
-                bookDetails?.let { verifyIfBookIsSaved(context, it.id) }
+    fun verifyClickedBookValue(context: Context): Book? {
+        return clickedBook.value?.let { book ->
+            viewModelScope.launch {
+                verifyIfBookIsSaved(context, book.id)
             }
+            book
         }
-        return bookDetails
     }
 
     private suspend fun verifyIfBookIsSaved(context: Context, id: String): BookMessage {
-        withContext(IO) {
-            val isBookSaved = repository.verifyIfBookIsSaved(context, id)
-            if (isBookSaved)
-                _bookMessage.emit(BookMessage.AddedBook)
-            if (!isBookSaved)
-                _bookMessage.emit(BookMessage.NotSavedBook)
-        }
+        val isBookSaved = repository.verifyIfBookIsSaved(context, id, userEmail)
+        if (isBookSaved)
+            _bookMessage.emit(BookMessage.AddedBook)
+        if (!isBookSaved)
+            _bookMessage.emit(BookMessage.NotSavedBook)
         return _bookMessage.value
     }
 
     suspend fun showBooks(context: Context): List<Book?> {
         return withContext(IO) {
-            val savedList = repository.showBooks(context, "manuela.souza@gmail.com")
-            formattingList(savedList)
-        }
-    }
-
-    private fun formattingList(savedList: List<SavedBook?>): List<Book?> {
-        return savedList.map { savedBook: SavedBook? ->
-            savedBook?.let { it: SavedBook ->
-                Book(
-                    it.bookApiId,
-                    it.bookTitle,
-                    it.bookAuthor,
-                    it.bookDescription,
-                    it.bookImage,
-                    it.bookLink
-                )
-            }
+            repository.showBooks(context, userEmail)
         }
     }
 
     fun cleanApiAnswer() {
         viewModelScope.launch {
             _apiAnswer.emit(ApiAnswer.Initial)
+        }
+    }
+
+    fun deleteBook(context: Context): BookMessage {
+        viewModelScope.launch {
+            clickedBook.value?.let {
+                runBlocking {
+                    deletingBook(context, it)
+                }
+            } ?: _bookMessage.emit(BookMessage.Error)
+        }
+        return bookMessage.value
+    }
+
+    private suspend fun deletingBook(context: Context, it: Book) {
+        withContext(IO) {
+            val wasBookDeleted = repository.deleteBook(context, it.id, userEmail)
+            if (wasBookDeleted)
+                _bookMessage.emit(BookMessage.DeletedBook)
+            else
+                _bookMessage.emit(BookMessage.Error)
         }
     }
 }
@@ -182,12 +177,13 @@ sealed class BookMessage {
     data object AddedBook : BookMessage()
     data object NotSavedBook : BookMessage()
     data object Error : BookMessage()
+    data object DeletedBook : BookMessage()
 }
 
 sealed class ApiAnswer {
     data object Loading : ApiAnswer()
     data object EmptyList : ApiAnswer()
-    data object BookList : ApiAnswer()
+    data object Success : ApiAnswer()
     data object Initial : ApiAnswer()
     data object Error : ApiAnswer()
 }

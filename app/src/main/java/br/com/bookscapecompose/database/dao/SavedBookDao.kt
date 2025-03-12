@@ -9,12 +9,12 @@ import br.com.bookscapecompose.model.SavedBook
 interface SavedBookDao {
 
     @Insert
-    fun saveBook(book: SavedBook)
+    suspend fun saveBook(book: SavedBook)
 
     @Query("SELECT * FROM savedbook WHERE bookApiId = :bookId")
-    fun fetchSavedBook(bookId: String): SavedBook?
+    suspend fun fetchSavedBook(bookId: String): SavedBook?
 
     @Query("SELECT * FROM savedbook WHERE userEmail = :userEmail")
-    fun showSavedBooks(userEmail: String): List<SavedBook?>
+    suspend fun showSavedBooks(userEmail: String): List<SavedBook?>
 
 }

@@ -6,6 +6,7 @@ import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
 import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
+import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class BookRepositoryImpl : BookRepository {
@@ -34,8 +35,8 @@ class BookRepositoryImpl : BookRepository {
                 val book = Book(
                     id = completeBook.id,
                     title = it.title,
-                    authors = it.authors?.toString(),
-                    description = it.description?.toString(),
+                    authors = it.authors?.toString() ?: "",
+                    description = it.description ?: "",
                     image = it.imageLinks?.thumbnail,
                     link = it.infoLink.orEmpty()
                 )
@@ -47,14 +48,14 @@ class BookRepositoryImpl : BookRepository {
     override fun verifyIfBookIsSaved(context: Context, bookId: String): Boolean {
         var doesBookExist = false
         val dao = database.getDatabaseInstance(context).SavedBookDao()
-        val existentBook: SavedBook? = dao.fetchSavedBook(bookId)
+        val existentBook: SavedBook? = runBlocking { dao.fetchSavedBook(bookId) }
         if (existentBook != null)
             doesBookExist = true
 
         return doesBookExist
     }
 
-    override fun saveBook(context: Context, book: Book, userEmail: String): Boolean {
+    override suspend fun saveBook(context: Context, book: Book, userEmail: String): Boolean {
         var isBookSaved: Boolean
         val dao = database.getDatabaseInstance(context).SavedBookDao()
         val savedBook = SavedBook(
@@ -76,7 +77,7 @@ class BookRepositoryImpl : BookRepository {
         return isBookSaved
     }
 
-    override fun showBooks(context: Context, userEmail: String): List<SavedBook?> {
+    override suspend fun showBooks(context: Context, userEmail: String): List<SavedBook?> {
         val dao = database.getDatabaseInstance(context).SavedBookDao()
         return dao.showSavedBooks(userEmail)
     }

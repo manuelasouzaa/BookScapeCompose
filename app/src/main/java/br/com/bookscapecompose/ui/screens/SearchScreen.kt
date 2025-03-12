@@ -2,10 +2,10 @@ package br.com.bookscapecompose.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.ui.components.BookScapeList
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 import kotlinx.coroutines.flow.first
@@ -16,20 +16,20 @@ fun SearchScreen(
     viewModel: SharedViewModel,
     navController: NavController,
 ) {
-    val list: List<Book?> = runBlocking { viewModel.bookList.first() }
-    viewModel.cleanTextField()
-
     BackHandler {
         navController.navigateUp()
     }
+
+    viewModel.cleanTextField()
+    viewModel.cleanApiAnswer()
+
+    val list = runBlocking { viewModel.bookList.first() }
 
     BookScapeList(
         title = "Found books",
         list = list,
         onClick = {
-            runBlocking {
-                viewModel.sendBook(it)
-            }
+            viewModel.sendBook(it)
             navController.navigate("BookDetailsScreen")
         }
     )

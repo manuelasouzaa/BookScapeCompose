@@ -7,19 +7,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SavedBookDetailsScreen(
     viewModel: SharedViewModel,
     navController: NavController,
 ) {
+    BackHandler {
+        navController.navigateUp()
+    }
+
     val context = LocalContext.current
-
     val uriHandler = LocalUriHandler.current
-
     val bookMessage = viewModel.bookMessage.collectAsState()
 
     val bookmarkIcon =
@@ -28,14 +30,9 @@ fun SavedBookDetailsScreen(
         else
             R.drawable.ic_add
 
-    BackHandler {
-        navController.navigateUp()
-    }
+    val answer = viewModel.verifyClickedBook(context)
 
-    val answer = runBlocking { viewModel.verifyClickedBook(context) }
-    if (answer == null)
-        navController.navigate("MainScreen")
-    if (answer != null) {
+    answer?.let {
         BookDetails(
             returnClick = { navController.navigateUp() },
             bookImageUrl = answer.image ?: "",
@@ -50,5 +47,5 @@ fun SavedBookDetailsScreen(
                 uriHandler.openUri(answer.link)
             }
         )
-    }
+    } ?: navController.navigate("MainScreen")
 }

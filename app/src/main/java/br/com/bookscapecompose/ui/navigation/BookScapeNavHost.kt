@@ -8,6 +8,7 @@ import br.com.bookscapecompose.ui.screens.AccountScreen
 import br.com.bookscapecompose.ui.screens.BookDetailsScreen
 import br.com.bookscapecompose.ui.screens.BookListScreen
 import br.com.bookscapecompose.ui.screens.MainScreen
+import br.com.bookscapecompose.ui.screens.SavedBookDetailsScreen
 import br.com.bookscapecompose.ui.screens.SearchScreen
 import br.com.bookscapecompose.ui.screens.SignInScreen
 import br.com.bookscapecompose.ui.screens.SignUpScreen
@@ -36,6 +37,9 @@ fun BookScapeNavHost(navController: NavHostController) {
         }
         composable("BookDetailsScreen") {
             BookDetailsScreen(sharedViewModel, navController)
+        }
+        composable("SavedBookDetailsScreen") {
+            SavedBookDetailsScreen(sharedViewModel, navController)
         }
         composable("AccountScreen") {
             AccountScreen(navController)

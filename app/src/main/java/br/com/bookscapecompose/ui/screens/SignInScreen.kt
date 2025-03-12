@@ -35,19 +35,18 @@ import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
 import br.com.bookscapecompose.ui.viewmodels.SignInMessage
 import br.com.bookscapecompose.ui.viewmodels.SignInViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel,
     navController: NavController,
 ) {
-    val context = LocalContext.current
-    val state by viewModel.uiState.collectAsState()
-    
     BackHandler {
         navController.navigateUp()
     }
+
+    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -107,27 +106,25 @@ fun SignInScreen(
             )
             Button(
                 onClick = {
-                    runBlocking {
-                        val message = viewModel.authenticate(context, state.email, state.password)
-                        when (message) {
-                            SignInMessage.Initial -> {}
+                    val message = viewModel.authenticate(context, state.email, state.password)
+                    when (message) {
+                        SignInMessage.Initial -> {}
 
-                            SignInMessage.Error ->
-                                toast(context, "An error occurred. Please try again")
+                        SignInMessage.Error ->
+                            toast(context, "An error occurred. Please try again")
 
-                            SignInMessage.MissingInformation ->
-                                toast(context, "Please complete the missing fields")
+                        SignInMessage.MissingInformation ->
+                            toast(context, "Please complete the missing fields")
 
-                            SignInMessage.WrongPassword ->
-                                toast(context, "Incorrect password. Please try again!")
+                        SignInMessage.WrongPassword ->
+                            toast(context, "Incorrect password. Please try again!")
 
-                            SignInMessage.UserDoesNotExist ->
-                                toast(context, "User not found. Please sign up")
+                        SignInMessage.UserDoesNotExist ->
+                            toast(context, "User not found. Please sign up")
 
-                            SignInMessage.UserLoggedIn -> {
-                                toast(context, "Logged in successfully!")
-                                navController.navigate("MainScreen")
-                            }
+                        SignInMessage.UserLoggedIn -> {
+                            toast(context, "Logged in successfully!")
+                            navController.navigate("MainScreen")
                         }
                     }
                 },

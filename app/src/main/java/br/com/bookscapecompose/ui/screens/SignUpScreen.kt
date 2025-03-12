@@ -35,19 +35,18 @@ import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
 import br.com.bookscapecompose.ui.viewmodels.SignUpMessage
 import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel,
     navController: NavController,
 ) {
-    val context = LocalContext.current
-    val state by viewModel.uiState.collectAsState()
-
     BackHandler {
         navController.navigateUp()
     }
+
+    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -116,30 +115,29 @@ fun SignUpScreen(
             )
             Button(
                 onClick = {
-                    runBlocking {
-                        val message = viewModel.addNewUser(
-                            context = context,
-                            email = state.email,
-                            username = state.username,
-                            password = state.password
-                        )
 
-                        when (message) {
-                            SignUpMessage.Initial -> {}
+                    val message = viewModel.addNewUser(
+                        context = context,
+                        email = state.email,
+                        username = state.username,
+                        password = state.password
+                    )
 
-                            SignUpMessage.Error ->
-                                toast(context, "An error occurred. Please try again")
+                    when (message) {
+                        SignUpMessage.Initial -> {}
 
-                            SignUpMessage.MissingInformation ->
-                                toast(context, "Please, complete the missing fields!")
+                        SignUpMessage.Error ->
+                            toast(context, "An error occurred. Please try again")
 
-                            SignUpMessage.UserIsAlreadyAdded ->
-                                toast(context, "You're already signed up. Please log in")
+                        SignUpMessage.MissingInformation ->
+                            toast(context, "Please, complete the missing fields!")
 
-                            SignUpMessage.UserSuccessfullyAdded -> {
-                                toast(context, "User added successfully!")
-                                navController.navigate("SignInScreen")
-                            }
+                        SignUpMessage.UserIsAlreadyAdded ->
+                            toast(context, "You're already signed up. Please log in")
+
+                        SignUpMessage.UserSuccessfullyAdded -> {
+                            toast(context, "User added successfully!")
+                            navController.navigate("SignInScreen")
                         }
                     }
                 },

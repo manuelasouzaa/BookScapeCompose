@@ -2,13 +2,14 @@ package br.com.bookscapecompose.ui.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import br.com.bookscapecompose.ui.repositories.UserRepositoryImpl
 import br.com.bookscapecompose.ui.uistate.SignInScreenUiState
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 class SignInViewModel : ViewModel() {
 
@@ -40,8 +41,8 @@ class SignInViewModel : ViewModel() {
         }
     }
 
-    suspend fun authenticate(context: Context, email: String, password: String): SignInMessage {
-        withContext(IO) {
+    fun authenticate(context: Context, email: String, password: String): SignInMessage {
+        viewModelScope.launch(IO) {
             when {
                 email.isEmpty() || password.isEmpty() ->
                     _signInMessage.emit(SignInMessage.MissingInformation)

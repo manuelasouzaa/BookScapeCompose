@@ -10,8 +10,8 @@ interface BookRepository {
 
     fun verifyIfBookIsSaved(context: Context, bookId: String): Boolean
 
-    fun saveBook(context: Context, book: Book, userEmail: String): Boolean
+    suspend fun saveBook(context: Context, book: Book, userEmail: String): Boolean
 
-    fun showBooks(context: Context, userEmail: String): List<SavedBook?>
+    suspend fun showBooks(context: Context, userEmail: String): List<SavedBook?>
 
 }

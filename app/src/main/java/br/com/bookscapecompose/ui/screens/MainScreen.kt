@@ -1,6 +1,5 @@
 package br.com.bookscapecompose.ui.screens
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,13 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,21 +32,42 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
+import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
     viewModel: SharedViewModel,
     navController: NavController,
 ) {
-    val state by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-
     BackHandler {
         navController.navigateUp()
+    }
+
+    val state by viewModel.uiState.collectAsState()
+    val apiAnswer = viewModel.apiAnswer.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val isLoading: Boolean = apiAnswer.value == ApiAnswer.Loading
+
+    LaunchedEffect(apiAnswer.value) {
+        when (apiAnswer.value) {
+            ApiAnswer.EmptyList ->
+                toast(context, "Book not found")
+
+            ApiAnswer.BookList -> {
+                navController.navigate("SearchScreen")
+            }
+
+            ApiAnswer.Error ->
+                toast(context, "Something went wrong. Try again")
+
+            else -> {}
+        }
     }
 
     Column(
@@ -80,40 +103,33 @@ fun MainScreen(
             searchText = state.searchText,
             onSearchChange = state.onSearchChange,
             onClick = {
-                runBlocking {
-                    state.searchText.let {
-                        if (it.isNotEmpty()) {
-                            viewModel.searchBooks(state.searchText)
-                            if (viewModel.bookList.value.isEmpty())
-                                Toast.makeText(context, "Book not found", Toast.LENGTH_SHORT)
-                                    .show()
-                            if (viewModel.bookList.value.isNotEmpty())
-                                navController.navigate("SearchScreen")
-                        }
+                if (state.searchText.isNotEmpty()) {
+                    coroutineScope.launch {
+                        viewModel.searchBooks(state.searchText)
                     }
                 }
             }
         )
 
+        if (isLoading)
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
-            onClick = {
-                navController.navigate("BookListScreen")
-            },
+            onClick = { navController.navigate("BookListScreen") },
             text = "My BookList",
-            imageVector = Icons.Default.List
+            imageVector = Icons.AutoMirrored.Filled.List
         )
 
         PersonalizedButton(
             modifier = Modifier,
-            onClick = {
-                navController.navigate("AccountScreen")
-            },
+            onClick = { navController.navigate("AccountScreen") },
             text = "My Account",
             imageVector = Icons.Default.AccountCircle
         )
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

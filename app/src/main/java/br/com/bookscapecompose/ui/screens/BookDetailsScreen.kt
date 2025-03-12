@@ -11,17 +11,18 @@ import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun BookDetailsScreen(
     viewModel: SharedViewModel,
     navController: NavController,
 ) {
+    BackHandler {
+        navController.navigateUp()
+    }
+
     val context = LocalContext.current
-
     val uriHandler = LocalUriHandler.current
-
     val bookMessage = viewModel.bookMessage.collectAsState()
 
     val icon =
@@ -30,21 +31,16 @@ fun BookDetailsScreen(
         else
             R.drawable.ic_add
 
-    BackHandler {
-        navController.navigateUp()
-    }
+    val answer = viewModel.verifyClickedBook(context)
 
-    val answer = runBlocking { viewModel.verifyClickedBook(context) }
-    if (answer == null)
-        navController.navigate("MainScreen")
-    if (answer != null) {
+    answer?.let {
         BookDetails(
             returnClick = { navController.navigateUp() },
             bookImageUrl = answer.image ?: "",
             bookmarkIcon = icon,
             bookmarkIconClick = {
                 if (icon == R.drawable.ic_add) {
-                    runBlocking { viewModel.saveBook(context) }
+                    viewModel.saveBook(context)
                     //TODO: dialog saying that the book was added successfully and with a button that goes to the bookList
                 }
                 if (icon == R.drawable.ic_added)
@@ -57,5 +53,5 @@ fun BookDetailsScreen(
                 uriHandler.openUri(answer.link)
             }
         )
-    }
+    } ?: navController.navigate("MainScreen")
 }

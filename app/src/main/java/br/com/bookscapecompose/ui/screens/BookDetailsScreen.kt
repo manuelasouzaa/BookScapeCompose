@@ -1,14 +1,21 @@
 package br.com.bookscapecompose.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookDetails
+import br.com.bookscapecompose.ui.components.BookScapeAlertDialog
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 
@@ -24,6 +31,7 @@ fun BookDetailsScreen(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val bookMessage = viewModel.bookMessage.collectAsState()
+    val openDialog = remember { mutableStateOf(false) }
 
     val icon =
         if (bookMessage.value == BookMessage.AddedBook)
@@ -41,7 +49,7 @@ fun BookDetailsScreen(
             bookmarkIconClick = {
                 if (icon == R.drawable.ic_add) {
                     viewModel.saveBook(context)
-                    //TODO: dialog saying that the book was added successfully and with a button that goes to the bookList
+                    openDialog.value = true
                 }
                 if (icon == R.drawable.ic_added)
                     toast(context, "This book is already on your list!")
@@ -54,4 +62,26 @@ fun BookDetailsScreen(
             }
         )
     } ?: navController.navigate("MainScreen")
+
+    if (openDialog.value) {
+        BookScapeAlertDialog(
+            buttonModifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp),
+            onDismissClick = {
+                openDialog.value = false
+            },
+            onConfirmClick = {
+                navController.navigate("BookListScreen")
+                openDialog.value = false
+            },
+            confirmButtonText = "Go to BookList",
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            dismissButtonText = "Close",
+            title = "Book saved successfully!",
+            text = null
+        )
+    }
 }

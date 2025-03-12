@@ -1,27 +1,22 @@
 package br.com.bookscapecompose.ui.components
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun PersonalizedButton(
+fun BookScapeButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    text: String,
-    imageVector: ImageVector
-) {
+    onClick: () -> Unit,
+    buttonText: String
+    ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
@@ -29,14 +24,8 @@ fun PersonalizedButton(
         ),
         modifier = modifier,
     ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(5.dp)
-        )
         Text(
-            text = text,
+            text = buttonText,
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(5.dp)
@@ -44,8 +33,8 @@ fun PersonalizedButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun PersonalizedButtonPreview() {
-    PersonalizedButton(Modifier, {}, "Preview", Icons.Default.Done)
+private fun BookScapeButtonPreview() {
+    BookScapeButton(onClick = {}, buttonText = "Button text")
 }

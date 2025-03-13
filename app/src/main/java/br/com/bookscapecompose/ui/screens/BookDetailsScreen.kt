@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -33,7 +32,6 @@ fun BookDetailsScreen(
     val uriHandler = LocalUriHandler.current
     val bookMessage = viewModel.bookMessage.collectAsState()
     val openDialog = remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
     val icon =
         if (bookMessage.value == BookMessage.AddedBook)

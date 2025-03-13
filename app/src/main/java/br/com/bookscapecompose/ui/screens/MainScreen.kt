@@ -50,21 +50,18 @@ fun MainScreen(
 
     val state by viewModel.uiState.collectAsState()
     val apiAnswer = viewModel.apiAnswer.collectAsState()
+    val loading by viewModel.loading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading: Boolean = apiAnswer.value == ApiAnswer.Loading
 
     LaunchedEffect(apiAnswer.value) {
         when (apiAnswer.value) {
-            ApiAnswer.EmptyList ->
-                toast(context, "Book not found")
+            ApiAnswer.EmptyList -> toast(context, "Book not found")
 
-            ApiAnswer.Success -> {
-                navController.navigate("SearchScreen")
-            }
+            ApiAnswer.Success -> navController.navigate("SearchScreen")
 
-            ApiAnswer.Error ->
-                toast(context, "Something went wrong. Try again")
+            ApiAnswer.Error -> toast(context, "Something went wrong. Try again")
 
             else -> {}
         }
@@ -116,7 +113,11 @@ fun MainScreen(
 
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
-            onClick = { navController.navigate("BookListScreen") },
+            onClick = {
+                viewModel.showBooks(context)
+                if (!loading)
+                    navController.navigate("BookListScreen")
+            },
             text = "My BookList",
             imageVector = Icons.AutoMirrored.Filled.List
         )
@@ -129,7 +130,6 @@ fun MainScreen(
         )
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

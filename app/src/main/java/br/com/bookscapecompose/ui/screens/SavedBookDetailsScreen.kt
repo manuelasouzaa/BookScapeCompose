@@ -72,12 +72,10 @@ fun SavedBookDetailsScreen(
             bookImageUrl = answer.image ?: "",
             bookmarkIcon = bookmarkIcon,
             bookmarkIconClick = {
-                if (bookmarkIcon == R.drawable.ic_remove) {
+                if (bookmarkIcon == R.drawable.ic_remove)
                     openDialog.value = true
-                }
-                if (bookmarkIcon == R.drawable.ic_add) {
+                if (bookmarkIcon == R.drawable.ic_add)
                     addBookAgain()
-                }
             },
             bookTitle = answer.title,
             bookAuthors = answer.authors ?: "",

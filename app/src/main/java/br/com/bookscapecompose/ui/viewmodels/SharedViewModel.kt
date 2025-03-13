@@ -36,6 +36,10 @@ class SharedViewModel : ViewModel() {
         MutableStateFlow(ApiAnswer.Initial)
     val apiAnswer = _apiAnswer.asStateFlow()
 
+    private val _loading: MutableStateFlow<Boolean> =
+        MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
     private val repository = BookRepositoryImpl()
 
     val userEmail = "manuela.souza@gmail.com"
@@ -107,10 +111,8 @@ class SharedViewModel : ViewModel() {
 
                     BookMessage.NotSavedBook -> {
                         val isBookSaved = repository.saveBook(context, book, userEmail)
-                        if (!isBookSaved)
-                            _bookMessage.emit(BookMessage.Error)
-                        if (isBookSaved)
-                            _bookMessage.emit(BookMessage.AddedBook)
+                        if (!isBookSaved) _bookMessage.emit(BookMessage.Error)
+                        if (isBookSaved) _bookMessage.emit(BookMessage.AddedBook)
                     }
 
                     else -> return@launch
@@ -138,9 +140,21 @@ class SharedViewModel : ViewModel() {
         return _bookMessage.value
     }
 
-    suspend fun showBooks(context: Context): List<Book?> {
+    fun showBooks(context: Context) {
+        viewModelScope.launch {
+            _loading.emit(true)
+
+            runBlocking { loadingSavedBooks(context) }
+
+            _loading.emit(false)
+        }
+    }
+
+    private suspend fun loadingSavedBooks(context: Context): List<Book?> {
         return withContext(IO) {
-            repository.showBooks(context, userEmail)
+            val books = repository.showBooks(context, userEmail)
+            _bookList.emit(books)
+            books
         }
     }
 
@@ -164,9 +178,10 @@ class SharedViewModel : ViewModel() {
     private suspend fun deletingBook(context: Context, it: Book) {
         withContext(IO) {
             val wasBookDeleted = repository.deleteBook(context, it.id, userEmail)
-            if (wasBookDeleted)
+            if (wasBookDeleted) {
                 _bookMessage.emit(BookMessage.DeletedBook)
-            else
+                loadingSavedBooks(context)
+            } else
                 _bookMessage.emit(BookMessage.Error)
         }
     }

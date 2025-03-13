@@ -23,6 +23,9 @@ fun BookListScreen(
     val books = viewModel.bookList.collectAsState()
 
     BookScapeList(
+        returnClick = {
+            navController.navigateUp()
+        },
         title = "My BookList",
         list = books.value,
         onClick = {

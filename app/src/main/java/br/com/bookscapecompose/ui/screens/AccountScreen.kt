@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,10 +25,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,14 +40,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
 
 @Composable
 fun AccountScreen(
+    viewModel: SharedViewModel,
     navController: NavController,
 ) {
     BackHandler {
         navController.navigateUp()
     }
+
+    val context = LocalContext.current
+    val loading by viewModel.loading.collectAsState()
 
     Column(
         modifier = Modifier
@@ -55,21 +64,22 @@ fun AccountScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.25f)
+                .fillMaxHeight(.2f)
                 .background(MaterialTheme.colorScheme.primary),
             verticalArrangement = Arrangement.Top,
         ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(top = 20.dp, start = 16.dp)
-                    .clickable {
-                        navController.navigateUp()
-                    }
-            )
+            Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clickable {
+                            navController.navigateUp()
+                        }
+                )
+            }
         }
 
         Spacer(
@@ -151,7 +161,9 @@ fun AccountScreen(
             ) {
                 Button(
                     onClick = {
-                        navController.navigate("BookListScreen")
+                        viewModel.showBooks(context)
+                        if (!loading)
+                            navController.navigate("BookListScreen")
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -186,5 +198,5 @@ fun AccountScreen(
 @Preview
 @Composable
 private fun AccountScreenPreview() {
-    AccountScreen(rememberNavController())
+    AccountScreen(SharedViewModel(), rememberNavController())
 }

@@ -1,13 +1,20 @@
 package br.com.bookscapecompose.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,9 +31,10 @@ import br.com.bookscapecompose.sampledata.sampleList
 
 @Composable
 fun BookScapeList(
+    returnClick: () -> Unit,
     title: String,
     list: List<Book?>,
-    onClick: (Book) -> Unit
+    onClick: (Book) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -35,17 +43,37 @@ fun BookScapeList(
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = title,
-            fontSize = 28.sp,
-            fontFamily = FontFamily((listOf(Font(R.font.kavoon)))),
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(16.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        returnClick()
+                    },
+            )
+
+            Text(
+                text = title,
+                fontSize = 28.sp,
+                fontFamily = FontFamily((listOf(Font(R.font.kavoon)))),
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+
+            Spacer(Modifier.size(50.dp))
+        }
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
         ) {
             items(list) { bookItem ->
                 bookItem?.let { book ->
@@ -62,6 +90,7 @@ fun BookScapeList(
 @Composable
 private fun BookScapeListPreview() {
     BookScapeList(
+        returnClick = {},
         title = "List",
         list = sampleList,
         onClick = {}

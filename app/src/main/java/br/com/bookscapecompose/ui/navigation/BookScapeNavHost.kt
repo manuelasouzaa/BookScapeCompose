@@ -42,7 +42,7 @@ fun BookScapeNavHost(navController: NavHostController) {
             SavedBookDetailsScreen(sharedViewModel, navController)
         }
         composable("AccountScreen") {
-            AccountScreen(navController)
+            AccountScreen(sharedViewModel, navController)
         }
         composable("BookListScreen") {
             BookListScreen(sharedViewModel, navController)

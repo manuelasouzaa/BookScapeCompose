@@ -25,6 +25,9 @@ fun SearchScreen(
     val list = runBlocking { viewModel.bookList.first() }
 
     BookScapeList(
+        returnClick = {
+            navController.navigateUp()
+        },
         title = "Found books",
         list = list,
         onClick = {

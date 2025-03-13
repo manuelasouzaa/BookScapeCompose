@@ -44,7 +44,7 @@ fun BookDetails(
     bookTitle: String,
     bookAuthors: String,
     bookDesc: String,
-    purchaseButtonClick: () -> Unit
+    purchaseButtonClick: () -> Unit,
 ) {
     Column(
         Modifier
@@ -138,7 +138,7 @@ fun BookDetails(
     }
 }
 
-@Preview
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun BookDetailsPreview() {
     BookDetails(

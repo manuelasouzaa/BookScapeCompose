@@ -50,7 +50,6 @@ fun MainScreen(
 
     val state by viewModel.uiState.collectAsState()
     val apiAnswer = viewModel.apiAnswer.collectAsState()
-    val loading by viewModel.loading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading: Boolean = apiAnswer.value == ApiAnswer.Loading
@@ -114,9 +113,7 @@ fun MainScreen(
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
             onClick = {
-                viewModel.showBooks(context)
-                if (!loading)
-                    navController.navigate("BookListScreen")
+                navController.navigate("BookListScreen")
             },
             text = "My BookList",
             imageVector = Icons.AutoMirrored.Filled.List

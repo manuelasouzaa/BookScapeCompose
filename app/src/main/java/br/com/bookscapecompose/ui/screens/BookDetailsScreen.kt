@@ -68,17 +68,13 @@ fun BookDetailsScreen(
             buttonModifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp),
-            onDismissClick = {
-                openDialog.value = false
-            },
+            onDismissClick = { openDialog.value = false },
             onConfirmClick = {
                 navController.navigate("BookListScreen")
                 openDialog.value = false
             },
             confirmButtonText = "Go to BookList",
-            onDismissRequest = {
-                openDialog.value = false
-            },
+            onDismissRequest = { openDialog.value = false },
             dismissButtonText = "Close",
             title = "Book saved successfully!",
             text = null

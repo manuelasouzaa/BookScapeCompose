@@ -63,9 +63,7 @@ fun BookDetails(
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .size(50.dp)
-                    .clickable {
-                        returnClick()
-                    },
+                    .clickable { returnClick() },
             )
 
             AsyncImage(
@@ -87,9 +85,7 @@ fun BookDetails(
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .size(50.dp)
-                    .clickable {
-                        bookmarkIconClick()
-                    },
+                    .clickable { bookmarkIconClick() },
             )
         }
 
@@ -128,9 +124,7 @@ fun BookDetails(
 
             PersonalizedButton(
                 modifier = Modifier.padding(20.dp),
-                onClick = {
-                    purchaseButtonClick()
-                },
+                onClick = { purchaseButtonClick() },
                 text = "Purchase",
                 imageVector = Icons.Default.ShoppingCart
             )

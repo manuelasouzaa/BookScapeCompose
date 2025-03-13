@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +55,7 @@ fun BookScapeList(
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .size(50.dp)
-                    .clickable {
-                        returnClick()
-                    },
+                    .clickable { returnClick() },
             )
 
             Text(
@@ -69,17 +68,29 @@ fun BookScapeList(
             Spacer(Modifier.size(50.dp))
         }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            items(list) { bookItem ->
-                bookItem?.let { book ->
-                    BookItem(book = book, onClick = {
-                        onClick(book)
-                    })
+        if (list.isEmpty()) {
+            Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center){
+                Text(
+                    text = "No books here yet!\nBegin adding your favorites now.",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
+
+        if (list.isNotEmpty()) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                items(list) { bookItem ->
+                    bookItem?.let { book ->
+                        BookItem(book = book, onClick = { onClick(book) })
+                    }
                 }
             }
         }
@@ -93,6 +104,17 @@ private fun BookScapeListPreview() {
         returnClick = {},
         title = "List",
         list = sampleList,
+        onClick = {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun BookScapeEmptyListPreview() {
+    BookScapeList(
+        returnClick = {},
+        title = "List",
+        list = emptyList(),
         onClick = {}
     )
 }

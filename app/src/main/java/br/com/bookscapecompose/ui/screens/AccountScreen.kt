@@ -25,8 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +50,6 @@ fun AccountScreen(
     }
 
     val context = LocalContext.current
-    val loading by viewModel.loading.collectAsState()
 
     Column(
         modifier = Modifier
@@ -75,9 +72,7 @@ fun AccountScreen(
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
                         .size(50.dp)
-                        .clickable {
-                            navController.navigateUp()
-                        }
+                        .clickable { navController.navigateUp() }
                 )
             }
         }
@@ -160,11 +155,7 @@ fun AccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = {
-                        viewModel.showBooks(context)
-                        if (!loading)
-                            navController.navigate("BookListScreen")
-                    },
+                    onClick = { navController.navigate("BookListScreen") },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),

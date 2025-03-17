@@ -34,7 +34,7 @@ import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
-import br.com.bookscapecompose.ui.viewmodels.GoogleApiAnswer
+import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -44,18 +44,18 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
     BackHandler { navController.navigateUp() }
 
     val state by viewModel.uiState.collectAsState()
-    val googleApiAnswer by viewModel.googleApiAnswer.collectAsState()
+    val googleApiAnswer by viewModel.apiAnswer.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val isLoading: Boolean = googleApiAnswer == GoogleApiAnswer.Loading
+    val isLoading: Boolean = googleApiAnswer == ApiAnswer.Loading
 
     LaunchedEffect(googleApiAnswer) {
         when (googleApiAnswer) {
-            GoogleApiAnswer.EmptyList -> toast(context, "Book not found")
+            ApiAnswer.EmptyList -> toast(context, "Book not found")
 
-            GoogleApiAnswer.Success -> navController.navigate("SearchScreen")
+            ApiAnswer.Success -> navController.navigate("SearchScreen")
 
-            GoogleApiAnswer.Error -> toast(context, "Something went wrong. Try again")
+            ApiAnswer.Error -> toast(context, "Something went wrong. Try again")
 
             else -> {}
         }

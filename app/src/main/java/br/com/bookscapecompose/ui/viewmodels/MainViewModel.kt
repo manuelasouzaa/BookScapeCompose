@@ -22,12 +22,9 @@ class MainViewModel(
         MutableStateFlow(MainScreenUiState())
     val uiState get() = _uiState.asStateFlow()
 
-    private val _googleApiAnswer: MutableStateFlow<GoogleApiAnswer> =
-        MutableStateFlow(GoogleApiAnswer.Initial)
-    val googleApiAnswer = _googleApiAnswer.asStateFlow()
-
     val userEmail = preferences.userEmail.asLiveData()
 
+    val apiAnswer = bookRepository.apiAnswer
 
     init {
         _uiState.update { currentState ->
@@ -41,31 +38,31 @@ class MainViewModel(
         }
 
         viewModelScope.launch(IO) {
-            _googleApiAnswer.emit(GoogleApiAnswer.Initial)
+            bookRepository.updateApiAnswerState(ApiAnswer.Initial)
         }
     }
 
     suspend fun searchBooks(searchText: String) {
         withContext(IO) {
-            _googleApiAnswer.emit(GoogleApiAnswer.Loading)
+            bookRepository.updateApiAnswerState(ApiAnswer.Loading)
             searchingBooks(searchText)
         }
     }
 
-    private suspend fun searchingBooks(searchText: String): GoogleApiAnswer {
+    private suspend fun searchingBooks(searchText: String) {
         val bookList = bookRepository.verifyApiAnswer(searchText)
         when {
             bookList.isNullOrEmpty() -> {
-                _googleApiAnswer.emit(GoogleApiAnswer.EmptyList)
+                bookRepository.updateApiAnswerState(ApiAnswer.EmptyList)
                 cleanTextField()
             }
 
             bookList.isNotEmpty() -> {
-                _googleApiAnswer.emit(GoogleApiAnswer.Success)
+                bookRepository.updateApiAnswerState(ApiAnswer.Success)
                 cleanTextField()
             }
         }
-        return googleApiAnswer.value
+
     }
 
     private fun cleanTextField() {
@@ -79,10 +76,10 @@ class MainViewModel(
     }
 }
 
-sealed class GoogleApiAnswer {
-    data object Loading : GoogleApiAnswer()
-    data object EmptyList : GoogleApiAnswer()
-    data object Success : GoogleApiAnswer()
-    data object Initial : GoogleApiAnswer()
-    data object Error : GoogleApiAnswer()
+sealed class ApiAnswer {
+    data object Loading : ApiAnswer()
+    data object EmptyList : ApiAnswer()
+    data object Success : ApiAnswer()
+    data object Initial : ApiAnswer()
+    data object Error : ApiAnswer()
 }

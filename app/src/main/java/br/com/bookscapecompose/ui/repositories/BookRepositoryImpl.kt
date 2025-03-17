@@ -1,31 +1,56 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
+import androidx.lifecycle.asLiveData
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
+import br.com.bookscapecompose.ui.navigation.UserPreferences
+import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
-class BookRepositoryImpl : BookRepository {
+class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookRepository {
 
-    private val database = BookScapeDatabase
+    private val bookDao = BookScapeDatabase.getDatabaseInstance(context).SavedBookDao()
 
     private val service by lazy { RetrofitInstance.api }
+    private val email = preferences.userEmail.asLiveData().value
+
+    private val _foundBooks: MutableStateFlow<List<Book?>> =
+        MutableStateFlow(emptyList())
+    override val foundBooks = _foundBooks.asStateFlow()
+
+    private val _clickedBook: MutableStateFlow<Book?> =
+        MutableStateFlow(null)
+    override val clickedBook = _clickedBook.asStateFlow()
+
+    private val _apiAnswer: MutableStateFlow<ApiAnswer> =
+        MutableStateFlow(ApiAnswer.Initial)
+    override val apiAnswer = _apiAnswer.asStateFlow()
 
     override suspend fun verifyApiAnswer(searchText: String): List<Book?>? {
         val answer = service.getBooks(searchText)
         return when {
-            answer.totalItems == 0 ->
+            answer.totalItems == 0 -> {
+                _foundBooks.emit(emptyList())
                 null
+            }
 
-            answer.totalItems > 0 ->
-                getList(answer)
+            answer.totalItems > 0 -> {
+                val list = getList(answer)
+                _foundBooks.emit(list)
+                list
+            }
 
-            else ->
+            else -> {
+                _foundBooks.emit(emptyList())
                 null
+            }
         }
     }
 
@@ -47,14 +72,14 @@ class BookRepositoryImpl : BookRepository {
         }
     }
 
-    override fun verifyIfBookIsSaved(context: Context, bookId: String, userEmail: String): Boolean {
-        val dao = database.getDatabaseInstance(context).SavedBookDao()
-        val existentBook: SavedBook? = runBlocking { dao.verifyIfBookIsSaved(bookId, userEmail) }
+    override fun verifyIfBookIsSaved(bookId: String, userEmail: String): Boolean {
+        val existentBook: SavedBook? = email?.let {
+            runBlocking { bookDao.verifyIfBookIsSaved(bookId, it) }
+        }
         return existentBook != null
     }
 
-    override suspend fun saveBook(context: Context, book: Book, userEmail: String): Boolean {
-        val dao = database.getDatabaseInstance(context).SavedBookDao()
+    override suspend fun saveBook(book: Book, userEmail: String): Boolean {
         val savedBook = SavedBook(
             savedBookId = UUID.randomUUID().toString(),
             userEmail = userEmail,
@@ -66,48 +91,22 @@ class BookRepositoryImpl : BookRepository {
             bookLink = book.link
         )
         return try {
-            dao.saveBook(savedBook)
+            bookDao.saveBook(savedBook)
             true
         } catch (e: Exception) {
             false
         }
     }
 
-    override suspend fun showBooks(context: Context, userEmail: String): List<Book?> {
-        val dao = database.getDatabaseInstance(context).SavedBookDao()
-        val list: List<SavedBook?> = dao.showSavedBooks(userEmail)
-        return formattingList(list)
+    override suspend fun sendBook(book: Book) {
+        _clickedBook.emit(book)
     }
 
-    private fun formattingList(savedList: List<SavedBook?>): List<Book?> {
-        return savedList.map { savedBook: SavedBook? ->
-            savedBook?.let { it: SavedBook ->
-                Book(
-                    it.bookApiId,
-                    it.bookTitle,
-                    it.bookAuthor,
-                    it.bookDescription,
-                    it.bookImage,
-                    it.bookLink
-                )
-            }
-        }
+    override suspend fun cleanApiAnswer() {
+        _foundBooks.emit(emptyList())
     }
 
-    override suspend fun deleteBook(context: Context, bookId: String, userEmail: String): Boolean {
-        val dao = database.getDatabaseInstance(context).SavedBookDao()
-        val savedBook = fetchBook(context, bookId, userEmail)
-        return try {
-            dao.deleteSavedBook(savedBook)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private suspend fun fetchBook(context: Context, bookId: String, userEmail: String): SavedBook {
-        val dao = database.getDatabaseInstance(context).SavedBookDao()
-        val savedBook = dao.fetchSavedBook(bookId, userEmail)
-        return savedBook
+    override suspend fun updateApiAnswerState(state: ApiAnswer) {
+        _apiAnswer.emit(state)
     }
 }

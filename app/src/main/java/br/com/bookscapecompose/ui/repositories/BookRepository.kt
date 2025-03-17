@@ -1,18 +1,25 @@
 package br.com.bookscapecompose.ui.repositories
 
-import android.content.Context
 import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
+import kotlinx.coroutines.flow.StateFlow
 
 interface BookRepository {
 
+    val foundBooks: StateFlow<List<Book?>>
+    val clickedBook: StateFlow<Book?>
+    val apiAnswer: StateFlow<ApiAnswer>
+
     suspend fun verifyApiAnswer(searchText: String): List<Book?>?
 
-    fun verifyIfBookIsSaved(context: Context, bookId: String, userEmail: String): Boolean
+    fun verifyIfBookIsSaved(bookId: String, userEmail: String): Boolean
 
-    suspend fun saveBook(context: Context, book: Book, userEmail: String): Boolean
+    suspend fun saveBook(book: Book, userEmail: String): Boolean
 
-    suspend fun showBooks(context: Context, userEmail: String): List<Book?>
+    suspend fun sendBook(book: Book)
 
-    suspend fun deleteBook(context: Context, bookId: String, userEmail: String): Boolean
+    suspend fun cleanApiAnswer()
+
+    suspend fun updateApiAnswerState(state: ApiAnswer)
 
 }

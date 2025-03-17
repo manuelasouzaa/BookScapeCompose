@@ -1,19 +1,17 @@
 package br.com.bookscapecompose.ui.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.bookscapecompose.ui.repositories.UserRepositoryImpl
+import br.com.bookscapecompose.ui.repositories.UserRepository
 import br.com.bookscapecompose.ui.uistate.SignInScreenUiState
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class SignInViewModel : ViewModel() {
-
-    private val repository = UserRepositoryImpl()
+class SignInViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SignInScreenUiState> =
         MutableStateFlow(SignInScreenUiState())
@@ -21,10 +19,12 @@ class SignInViewModel : ViewModel() {
 
     private val _signInMessage: MutableStateFlow<SignInMessage> =
         MutableStateFlow(SignInMessage.Initial)
-
-    private val message = _signInMessage.asStateFlow()
+    val signInMessage = _signInMessage.asStateFlow()
 
     init {
+        viewModelScope.launch(IO) {
+            _signInMessage.emit(SignInMessage.Initial)
+        }
         _uiState.update { currentState ->
             currentState.copy(
                 onEmailChange = {
@@ -41,56 +41,35 @@ class SignInViewModel : ViewModel() {
         }
     }
 
-    fun authenticate(context: Context, email: String, password: String): SignInMessage {
-        viewModelScope.launch(IO) {
-            when {
-                email.isEmpty() || password.isEmpty() ->
-                    _signInMessage.emit(SignInMessage.MissingInformation)
-
-                email.isNotEmpty() && password.isNotEmpty() -> {
-                    val verification = verifyIfUserExists(context, email)
-
-                    if (!verification)
-                        _signInMessage.emit(SignInMessage.UserDoesNotExist)
-
+    fun authenticate(email: String, password: String): SignInMessage {
+        viewModelScope.launch {
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                withContext(IO) {
+                    val verification = verifyIfUserExists(email)
                     if (verification) {
-                        try {
-                            auth(context, email, password)
-                        } catch (e: Exception) {
-                            _signInMessage.emit(SignInMessage.Error)
-                        }
+                        val auth = auth(email, password)
+                        if (auth)
+                            userRepository.login(email)
+                    } else {
+                        _signInMessage.emit(SignInMessage.UserDoesNotExist)
                     }
                 }
-
-                else -> {
-                    _signInMessage.emit(SignInMessage.Initial)
-                }
-            }
+            } else
+                _signInMessage.emit(SignInMessage.MissingInformation)
         }
-        return message.value
+        return signInMessage.value
     }
 
-    private suspend fun auth(
-        context: Context,
-        email: String,
-        password: String,
-    ) {
-        val userAuth = repository.fetchAndAuthenticateUser(context, email, password)
-        if (userAuth != null) {
-            _signInMessage.emit(SignInMessage.UserLoggedIn)
-        }
-        if (userAuth == null) {
-            _signInMessage.emit(SignInMessage.WrongPassword)
-        }
+    private fun verifyIfUserExists(email: String): Boolean {
+        val searchedUser = this.userRepository.fetchUserByEmail(email)
+        return searchedUser != null
     }
 
-    private fun verifyIfUserExists(context: Context, email: String): Boolean {
-        var doesUserAlreadyExist = false
-        val searchedUser = repository.fetchUserByEmail(context, email)
-        if (searchedUser != null) {
-            doesUserAlreadyExist = true
-        }
-        return doesUserAlreadyExist
+    private suspend fun auth(email: String, password: String): Boolean {
+        val userAuth = this.userRepository.fetchAndAuthenticateUser(email, password)
+        if (userAuth == null) _signInMessage.emit(SignInMessage.WrongPassword)
+        else _signInMessage.emit(SignInMessage.UserLoggedIn)
+        return userAuth != null
     }
 }
 

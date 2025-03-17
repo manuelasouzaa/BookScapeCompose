@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
@@ -41,12 +41,39 @@ fun SignUpScreen(
     viewModel: SignUpViewModel,
     navController: NavController,
 ) {
-    BackHandler {
-        navController.navigateUp()
-    }
+    BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+    val message by viewModel.signUpMessage.collectAsState()
+
+    fun validateAndShowToasts() {
+        viewModel.addNewUser(
+            email = state.email,
+            username = state.username,
+            password = state.password
+        )
+    }
+
+    LaunchedEffect(message) {
+        when (message) {
+            SignUpMessage.Initial -> {}
+
+            SignUpMessage.Error ->
+                toast(context, "An error occurred. Please try again")
+
+            SignUpMessage.MissingInformation ->
+                toast(context, "Please, complete the missing fields!")
+
+            SignUpMessage.UserIsAlreadyAdded ->
+                toast(context, "You're already signed up. Please log in")
+
+            SignUpMessage.UserSuccessfullyAdded -> {
+                toast(context, "User added successfully!")
+                navController.navigate("SignInScreen")
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -66,9 +93,7 @@ fun SignUpScreen(
                 text = stringResource(R.string.bookscape),
                 fontSize = 26.sp,
                 modifier = Modifier.padding(top = 16.dp),
-                fontFamily = FontFamily(
-                    listOf(Font(R.font.kavoon))
-                ),
+                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -83,11 +108,8 @@ fun SignUpScreen(
             Text(
                 text = "Sign Up",
                 fontSize = 34.sp,
-                fontFamily = FontFamily(
-                    listOf(Font(R.font.kavoon))
-                ),
+                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.secondary
-
             )
             BookScapeTextField(
                 value = state.email,
@@ -114,33 +136,7 @@ fun SignUpScreen(
                 isPassword = true
             )
             Button(
-                onClick = {
-
-                    val message = viewModel.addNewUser(
-                        context = context,
-                        email = state.email,
-                        username = state.username,
-                        password = state.password
-                    )
-
-                    when (message) {
-                        SignUpMessage.Initial -> {}
-
-                        SignUpMessage.Error ->
-                            toast(context, "An error occurred. Please try again")
-
-                        SignUpMessage.MissingInformation ->
-                            toast(context, "Please, complete the missing fields!")
-
-                        SignUpMessage.UserIsAlreadyAdded ->
-                            toast(context, "You're already signed up. Please log in")
-
-                        SignUpMessage.UserSuccessfullyAdded -> {
-                            toast(context, "User added successfully!")
-                            navController.navigate("SignInScreen")
-                        }
-                    }
-                },
+                onClick = { validateAndShowToasts() },
                 content = {
                     Text(
                         text = "Sign Up",
@@ -161,9 +157,7 @@ fun SignUpScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
-                        .clickable {
-                            navController.navigate("SignInScreen")
-                        }
+                        .clickable { navController.navigate("SignInScreen") }
                 )
             }
         }
@@ -173,5 +167,5 @@ fun SignUpScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SignUpScreenPreview() {
-    SignUpScreen(SignUpViewModel(), rememberNavController())
+//    SignUpScreen(viewModel(), rememberNavController())
 }

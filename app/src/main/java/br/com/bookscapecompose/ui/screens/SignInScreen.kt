@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeTextField
@@ -41,12 +41,42 @@ fun SignInScreen(
     viewModel: SignInViewModel,
     navController: NavController,
 ) {
-    BackHandler {
-        navController.navigateUp()
-    }
+    BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
+    val message by viewModel.signInMessage.collectAsState()
+
+    fun validateAndShowToasts() {
+        if (state.email.isEmpty() || state.password.isEmpty()) {
+            toast(context, "Please, complete the missing fields")
+        } else {
+            viewModel.authenticate(state.email, state.password)
+        }
+    }
+
+    LaunchedEffect(message) {
+        when (message) {
+            SignInMessage.UserLoggedIn -> {
+                toast(context, "Logged in successfully!")
+                navController.navigate("MainScreen")
+            }
+
+            SignInMessage.Error ->
+                toast(context, "An error occurred. Please try again")
+
+            SignInMessage.MissingInformation ->
+                toast(context, "Please complete the missing fields")
+
+            SignInMessage.WrongPassword ->
+                toast(context, "Incorrect password. Please try again!")
+
+            SignInMessage.UserDoesNotExist ->
+                toast(context, "User not found. Please sign up")
+
+            SignInMessage.Initial -> {}
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -105,29 +135,7 @@ fun SignInScreen(
                 isPassword = true
             )
             Button(
-                onClick = {
-                    val message = viewModel.authenticate(context, state.email, state.password)
-                    when (message) {
-                        SignInMessage.Initial -> {}
-
-                        SignInMessage.Error ->
-                            toast(context, "An error occurred. Please try again")
-
-                        SignInMessage.MissingInformation ->
-                            toast(context, "Please complete the missing fields")
-
-                        SignInMessage.WrongPassword ->
-                            toast(context, "Incorrect password. Please try again!")
-
-                        SignInMessage.UserDoesNotExist ->
-                            toast(context, "User not found. Please sign up")
-
-                        SignInMessage.UserLoggedIn -> {
-                            toast(context, "Logged in successfully!")
-                            navController.navigate("MainScreen")
-                        }
-                    }
-                },
+                onClick = { validateAndShowToasts() },
                 content = {
                     Text(
                         text = "Sign In",
@@ -160,5 +168,5 @@ fun SignInScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SignInScreenPreview() {
-    SignInScreen(SignInViewModel(), rememberNavController())
+//    SignInScreen(viewModel(), rememberNavController())
 }

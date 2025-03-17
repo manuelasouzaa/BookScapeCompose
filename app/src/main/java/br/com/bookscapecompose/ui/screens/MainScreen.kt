@@ -30,37 +30,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
-import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
-import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
+import br.com.bookscapecompose.ui.viewmodels.GoogleApiAnswer
+import br.com.bookscapecompose.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(
-    viewModel: SharedViewModel,
-    navController: NavController,
-) {
-    BackHandler {
-        navController.navigateUp()
-    }
+fun MainScreen(viewModel: MainViewModel, navController: NavController) {
+
+    BackHandler { navController.navigateUp() }
 
     val state by viewModel.uiState.collectAsState()
-    val apiAnswer = viewModel.apiAnswer.collectAsState()
+    val googleApiAnswer by viewModel.googleApiAnswer.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val isLoading: Boolean = apiAnswer.value == ApiAnswer.Loading
+    val isLoading: Boolean = googleApiAnswer == GoogleApiAnswer.Loading
 
-    LaunchedEffect(apiAnswer.value) {
-        when (apiAnswer.value) {
-            ApiAnswer.EmptyList -> toast(context, "Book not found")
+    LaunchedEffect(googleApiAnswer) {
+        when (googleApiAnswer) {
+            GoogleApiAnswer.EmptyList -> toast(context, "Book not found")
 
-            ApiAnswer.Success -> navController.navigate("SearchScreen")
+            GoogleApiAnswer.Success -> navController.navigate("SearchScreen")
 
-            ApiAnswer.Error -> toast(context, "Something went wrong. Try again")
+            GoogleApiAnswer.Error -> toast(context, "Something went wrong. Try again")
 
             else -> {}
         }
@@ -87,9 +82,7 @@ fun MainScreen(
                 text = stringResource(R.string.bookscape),
                 fontSize = 28.sp,
                 modifier = Modifier.padding(16.dp),
-                fontFamily = FontFamily(
-                    listOf(Font(R.font.kavoon))
-                ),
+                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -112,9 +105,7 @@ fun MainScreen(
 
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
-            onClick = {
-                navController.navigate("BookListScreen")
-            },
+            onClick = { navController.navigate("BookListScreen") },
             text = "My BookList",
             imageVector = Icons.AutoMirrored.Filled.List
         )
@@ -131,5 +122,5 @@ fun MainScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MainScreenPreview() {
-    MainScreen(SharedViewModel(), rememberNavController())
+//    MainScreen(viewModel(), rememberNavController())
 }

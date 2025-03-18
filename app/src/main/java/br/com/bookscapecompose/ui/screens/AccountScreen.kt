@@ -21,10 +21,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,20 +38,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.PersonalizedButton
-import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
+import br.com.bookscapecompose.ui.viewmodels.AccountViewModel
 
 @Composable
-fun AccountScreen(
-    viewModel: SharedViewModel,
-    navController: NavController,
-) {
-    BackHandler {
-        navController.navigateUp()
-    }
+fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
+    BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
+    val isLoading = viewModel.loading.collectAsState()
+    val user = viewModel.user.collectAsState()
+
+    viewModel.account()
+
+    fun goToSignInScreen() {
+        toast(context, "You're logged out. Sign in.")
+        navController.navigate("SignInScreen")
+    }
 
     Column(
         modifier = Modifier
@@ -58,130 +64,144 @@ fun AccountScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.2f)
-                .background(MaterialTheme.colorScheme.primary),
-            verticalArrangement = Arrangement.Top,
-        ) {
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
+        if (isLoading.value) {
+            Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .size(50.dp)
-                        .clickable { navController.navigateUp() }
+                        .padding(16.dp)
+                        .size(40.dp)
                 )
             }
-        }
-
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(3.dp)
-                .background(MaterialTheme.colorScheme.tertiary)
-        )
-
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = null,
-            modifier = Modifier
-                .offset(y = (-100).dp)
-                .size(180.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .scale(1.15f),
-            tint = MaterialTheme.colorScheme.onSecondary,
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .offset(y = (-80).dp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Username",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(16.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(
+        } else {
+            user.value?.let { loggedUser ->
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(.35f)
-                        .height(2.dp)
-                        .background(MaterialTheme.colorScheme.secondary)
-                )
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "E-mail",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(top = 50.dp, bottom = 5.dp)
-                )
-
-                Text(
-                    text = "E-mail do usuário",
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    modifier = Modifier.padding(
-                        top = 16.dp,
-                        bottom = 30.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    onClick = { navController.navigate("BookListScreen") },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(.5f)
-                        .padding(top = 21.dp, bottom = 21.dp),
+                        .fillMaxWidth()
+                        .fillMaxHeight(.2f)
+                        .background(MaterialTheme.colorScheme.primary),
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    Text(
-                        text = "My BookList",
-                        fontSize = 20.sp,
-                        color = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.padding(5.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clickable { navController.navigateUp() }
+                        )
+                    }
                 }
 
-                PersonalizedButton(
+                Spacer(
                     modifier = Modifier
-                        .fillMaxWidth(.5f)
-                        .padding(top = 5.dp),
-                    onClick = {
-                        //TODO: click logout function
-                    },
-                    text = "Logout",
-                    imageVector = Icons.Default.ExitToApp
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .background(MaterialTheme.colorScheme.tertiary)
                 )
-            }
+
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .offset(y = (-100).dp)
+                        .size(180.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.tertiary)
+                        .scale(1.15f),
+                    tint = MaterialTheme.colorScheme.onSecondary,
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset(y = (-80).dp),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = loggedUser.username,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(16.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth(.35f)
+                                .height(2.dp)
+                                .background(MaterialTheme.colorScheme.secondary)
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "E-mail",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(top = 50.dp, bottom = 5.dp)
+                        )
+
+                        Text(
+                            text = loggedUser.userEmail,
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                bottom = 30.dp,
+                                start = 16.dp,
+                                end = 16.dp
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Button(
+                            onClick = { navController.navigate("BookListScreen") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth(.5f)
+                                .padding(top = 21.dp, bottom = 21.dp),
+                        ) {
+                            Text(
+                                text = "My BookList",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.padding(5.dp)
+                            )
+                        }
+
+                        PersonalizedButton(
+                            modifier = Modifier
+                                .fillMaxWidth(.5f)
+                                .padding(top = 5.dp),
+                            onClick = { viewModel.logout() },
+                            text = "Logout",
+                            imageVector = Icons.Default.ExitToApp
+                        )
+                    }
+                }
+            } ?: goToSignInScreen()
         }
     }
 }
@@ -189,5 +209,5 @@ fun AccountScreen(
 @Preview
 @Composable
 private fun AccountScreenPreview() {
-    AccountScreen(SharedViewModel(), rememberNavController())
+//    AccountScreen(viewModel(), rememberNavController())
 }

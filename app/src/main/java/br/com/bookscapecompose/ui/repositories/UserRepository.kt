@@ -14,6 +14,6 @@ interface UserRepository {
 
     suspend fun logout()
 
-    fun fetchUserByEmailPreference(): User?
+    suspend fun fetchUserByEmailPreference(): User?
 
 }

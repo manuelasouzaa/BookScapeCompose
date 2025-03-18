@@ -1,27 +1,41 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
+import androidx.lifecycle.asLiveData
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.User
+import br.com.bookscapecompose.ui.navigation.UserPreferences
 
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(private val preferences: UserPreferences, context: Context) :
+    UserRepository {
 
-    private val database = BookScapeDatabase
+    private val userDao = BookScapeDatabase.getDatabaseInstance(context).UserDao()
+    private val userEmail = preferences.userEmail.asLiveData()
 
-    override fun addUser(context: Context, user: User) {
-        val dao = database.getDatabaseInstance(context).UserDao()
-        dao.saveUser(user)
+    override fun addUser(user: User) {
+        userDao.saveUser(user)
     }
 
-    override fun fetchUserByEmail(context: Context, email: String): User? {
-        val dao = database.getDatabaseInstance(context).UserDao()
-        return dao.fetchUserByEmail(email)
+    override fun fetchUserByEmail(email: String): User? {
+        return userDao.fetchUserByEmail(email)
     }
 
-    override fun fetchAndAuthenticateUser(
-        context: Context, email: String, password: String,
-    ): User? {
-        val dao = database.getDatabaseInstance(context).UserDao()
-        return dao.fetchAndAuthenticateUser(email, password)
+    override fun fetchUserByEmailPreference(): User? {
+        return userEmail.value?.let {
+            userDao.fetchUserByEmail(it)
+        }
+    }
+
+    override suspend fun fetchAndAuthenticateUser(email: String, password: String): User? {
+        return userDao.fetchAndAuthenticateUser(email, password)
+    }
+
+    override suspend fun login(email: String) {
+        preferences.updateLoggedState(true)
+        preferences.updateUserEmail(email)
+    }
+
+    override suspend fun logout() {
+        preferences.logout()
     }
 }

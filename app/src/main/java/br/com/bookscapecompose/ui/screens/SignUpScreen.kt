@@ -157,7 +157,10 @@ fun SignUpScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
-                        .clickable { navController.navigate("SignInScreen") }
+                        .clickable {
+                            navController.navigate("SignInScreen")
+                            viewModel.clearSignUpMessage()
+                        }
                 )
             }
         }

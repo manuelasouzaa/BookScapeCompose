@@ -45,7 +45,7 @@ class SignInViewModel(private val userRepository: UserRepository) : ViewModel() 
         viewModelScope.launch {
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 withContext(IO) {
-                    val verification = verifyIfUserExists(email)
+                    val verification = verifyIfUserExists()
                     if (verification) {
                         val auth = auth(email, password)
                         if (auth)
@@ -60,8 +60,8 @@ class SignInViewModel(private val userRepository: UserRepository) : ViewModel() 
         return signInMessage.value
     }
 
-    private fun verifyIfUserExists(email: String): Boolean {
-        val searchedUser = this.userRepository.fetchUserByEmail(email)
+    private fun verifyIfUserExists(): Boolean {
+        val searchedUser = this.userRepository.fetchUserByEmail(uiState.value.email)
         return searchedUser != null
     }
 
@@ -70,6 +70,18 @@ class SignInViewModel(private val userRepository: UserRepository) : ViewModel() 
         if (userAuth == null) _signInMessage.emit(SignInMessage.WrongPassword)
         else _signInMessage.emit(SignInMessage.UserLoggedIn)
         return userAuth != null
+    }
+
+    fun clearSignInMessage() {
+        viewModelScope.launch {
+            _signInMessage.emit(SignInMessage.Initial)
+            _uiState.update { state ->
+                state.copy(
+                    email = "",
+                    password = ""
+                )
+            }
+        }
     }
 }
 

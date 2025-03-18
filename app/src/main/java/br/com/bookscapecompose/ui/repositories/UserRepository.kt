@@ -1,14 +1,19 @@
 package br.com.bookscapecompose.ui.repositories
 
-import android.content.Context
 import br.com.bookscapecompose.model.User
 
 interface UserRepository {
 
-    fun addUser(context: Context, user: User)
+    fun addUser(user: User)
 
-    fun fetchUserByEmail(context: Context, email: String): User?
+    fun fetchUserByEmail(email: String): User?
 
-    fun fetchAndAuthenticateUser(context: Context, email: String, password: String): User?
+    suspend fun fetchAndAuthenticateUser(email: String, password: String): User?
+
+    suspend fun login(email: String)
+
+    suspend fun logout()
+
+    fun fetchUserByEmailPreference(): User?
 
 }

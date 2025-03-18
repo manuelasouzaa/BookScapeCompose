@@ -69,6 +69,19 @@ class SignUpViewModel(private val userRepository: UserRepository) : ViewModel() 
         }
         return signUpMessage.value
     }
+
+    fun clearSignUpMessage() {
+        viewModelScope.launch {
+            _signUpMessage.emit(SignUpMessage.Initial)
+            _uiState.update { state ->
+                state.copy(
+                    email = "",
+                    username = "",
+                    password = ""
+                )
+            }
+        }
+    }
 }
 
 sealed class SignUpMessage {

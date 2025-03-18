@@ -158,6 +158,7 @@ fun SignInScreen(
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
                         .clickable {
                             navController.navigate("SignUpScreen")
+                            viewModel.clearSignInMessage()
                         }
                 )
             }

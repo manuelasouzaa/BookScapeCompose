@@ -1,7 +1,6 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
-import androidx.lifecycle.asLiveData
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
@@ -11,36 +10,28 @@ import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookRepository {
 
     private val bookDao = BookScapeDatabase.getDatabaseInstance(context).SavedBookDao()
-
     private val service by lazy { RetrofitInstance.api }
-    private val email = preferences.userEmail.asLiveData().value
+    override val userEmail = preferences.userEmail
 
-    private val _foundBooks: MutableStateFlow<List<Book?>> =
-        MutableStateFlow(emptyList())
+    private val _foundBooks: MutableStateFlow<List<Book?>> = MutableStateFlow(emptyList())
     override val foundBooks = _foundBooks.asStateFlow()
 
-    private val _clickedBook: MutableStateFlow<Book?> =
-        MutableStateFlow(null)
+    private val _clickedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
     override val clickedBook = _clickedBook.asStateFlow()
 
-    private val _apiAnswer: MutableStateFlow<ApiAnswer> =
-        MutableStateFlow(ApiAnswer.Initial)
+    private val _apiAnswer: MutableStateFlow<ApiAnswer> = MutableStateFlow(ApiAnswer.Initial)
     override val apiAnswer = _apiAnswer.asStateFlow()
 
     override suspend fun verifyApiAnswer(searchText: String): List<Book?>? {
         val answer = service.getBooks(searchText)
         return when {
-            answer.totalItems == 0 -> {
-                _foundBooks.emit(emptyList())
-                null
-            }
-
             answer.totalItems > 0 -> {
                 val list = getList(answer)
                 _foundBooks.emit(list)
@@ -72,30 +63,43 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
         }
     }
 
-    override fun verifyIfBookIsSaved(bookId: String, userEmail: String): Boolean {
-        val existentBook: SavedBook? = email?.let {
-            runBlocking { bookDao.verifyIfBookIsSaved(bookId, it) }
+    override suspend fun verifyIfBookIsSaved(): Boolean {
+        return clickedBook.value?.let { clickedBook ->
+            verification(clickedBook)
+        } ?: false
+    }
+
+    private suspend fun verification(clickedBook: Book): Boolean {
+        var existentBook: SavedBook? = null
+
+        userEmail.first()?.let { userEmail ->
+            existentBook = if (userEmail != "") {
+                bookDao.verifyIfBookIsSaved(clickedBook.id, userEmail)
+            } else null
         }
+
         return existentBook != null
     }
 
-    override suspend fun saveBook(book: Book, userEmail: String): Boolean {
-        val savedBook = SavedBook(
-            savedBookId = UUID.randomUUID().toString(),
-            userEmail = userEmail,
-            bookTitle = book.title,
-            bookAuthor = book.authors ?: "",
-            bookDescription = book.description ?: "",
-            bookImage = book.image ?: "",
-            bookApiId = book.id,
-            bookLink = book.link
-        )
-        return try {
-            bookDao.saveBook(savedBook)
+    override suspend fun saveBook(): Boolean {
+        return userEmail.first()?.let { userEmail ->
+            clickedBook.value?.let { book ->
+                val savedBook = SavedBook(
+                    savedBookId = UUID.randomUUID().toString(),
+                    userEmail = userEmail,
+                    bookTitle = book.title,
+                    bookAuthor = book.authors ?: "",
+                    bookDescription = book.description ?: "",
+                    bookImage = book.image ?: "",
+                    bookApiId = book.id,
+                    bookLink = book.link
+                )
+                runBlocking {
+                    bookDao.saveBook(savedBook)
+                }
+            }
             true
-        } catch (e: Exception) {
-            false
-        }
+        } ?: false
     }
 
     override suspend fun sendBook(book: Book) {
@@ -109,4 +113,9 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
     override suspend fun updateApiAnswerState(state: ApiAnswer) {
         _apiAnswer.emit(state)
     }
+
+    override suspend fun clearClickedBook() {
+        _clickedBook.emit(null)
+    }
+
 }

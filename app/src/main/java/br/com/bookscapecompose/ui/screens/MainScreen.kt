@@ -44,10 +44,16 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
     BackHandler { navController.navigateUp() }
 
     val state by viewModel.uiState.collectAsState()
+    val loggedUser by viewModel.loggedUser.collectAsState(true)
     val googleApiAnswer by viewModel.apiAnswer.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading: Boolean = googleApiAnswer == ApiAnswer.Loading
+
+    LaunchedEffect(loggedUser) {
+        if (loggedUser == false)
+            navController.navigate("SignInScreen")
+    }
 
     LaunchedEffect(googleApiAnswer) {
         when (googleApiAnswer) {

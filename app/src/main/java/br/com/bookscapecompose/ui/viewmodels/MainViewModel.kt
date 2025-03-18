@@ -1,7 +1,6 @@
 package br.com.bookscapecompose.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import br.com.bookscapecompose.ui.navigation.UserPreferences
 import br.com.bookscapecompose.ui.repositories.BookRepository
@@ -22,8 +21,7 @@ class MainViewModel(
         MutableStateFlow(MainScreenUiState())
     val uiState get() = _uiState.asStateFlow()
 
-    val userEmail = preferences.userEmail.asLiveData()
-
+    val loggedUser = preferences.state
     val apiAnswer = bookRepository.apiAnswer
 
     init {
@@ -62,7 +60,6 @@ class MainViewModel(
                 cleanTextField()
             }
         }
-
     }
 
     private fun cleanTextField() {

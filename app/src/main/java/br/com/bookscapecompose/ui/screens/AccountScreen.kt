@@ -26,19 +26,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import br.com.bookscapecompose.expressions.toast
+import br.com.bookscapecompose.model.User
+import br.com.bookscapecompose.sampledata.sampleUser
 import br.com.bookscapecompose.ui.components.PersonalizedButton
 import br.com.bookscapecompose.ui.viewmodels.AccountViewModel
 
@@ -46,17 +50,32 @@ import br.com.bookscapecompose.ui.viewmodels.AccountViewModel
 fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
     BackHandler { navController.navigateUp() }
 
-    val context = LocalContext.current
-    val isLoading = viewModel.loading.collectAsState()
+    val isLoading by viewModel.loading.collectAsState()
     val user = viewModel.user.collectAsState()
 
     viewModel.account()
 
-    fun goToSignInScreen() {
-        toast(context, "You're logged out. Sign in.")
-        navController.navigate("SignInScreen")
+    fun logout() {
+        viewModel.logout()
     }
 
+    AccountScreenContent(
+        isLoading = isLoading,
+        user = user,
+        returnClick = { navController.navigateUp() },
+        logout = { logout() },
+        navigate = { navController.navigate(it) }
+    )
+}
+
+@Composable
+fun AccountScreenContent(
+    isLoading: Boolean,
+    user: State<User?>,
+    returnClick: () -> Boolean,
+    logout: () -> Unit,
+    navigate: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +83,7 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        if (isLoading.value) {
+        if (isLoading) {
             Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -92,7 +111,7 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .size(50.dp)
-                                .clickable { navController.navigateUp() }
+                                .clickable { returnClick() }
                         )
                     }
                 }
@@ -175,7 +194,7 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button(
-                            onClick = { navController.navigate("BookListScreen") },
+                            onClick = { navigate("BookListScreen") },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.onSecondaryContainer
                             ),
@@ -195,13 +214,13 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
                             modifier = Modifier
                                 .fillMaxWidth(.5f)
                                 .padding(top = 5.dp),
-                            onClick = { viewModel.logout() },
+                            onClick = { logout() },
                             text = "Logout",
                             imageVector = Icons.Default.ExitToApp
                         )
                     }
                 }
-            } ?: goToSignInScreen()
+            } ?: navigate("SignInScreen")
         }
     }
 }
@@ -209,5 +228,23 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
 @Preview
 @Composable
 private fun AccountScreenPreview() {
-//    AccountScreen(viewModel(), rememberNavController())
+    AccountScreenContent(
+        isLoading = false,
+        user = remember { mutableStateOf(sampleUser) },
+        returnClick = { true },
+        logout = {},
+        navigate = {}
+    )
+}
+
+@Preview
+@Composable
+private fun AccountScreenLoadingPreview() {
+    AccountScreenContent(
+        isLoading = true,
+        user = remember { mutableStateOf(sampleUser) },
+        returnClick = { true },
+        logout = {},
+        navigate = {}
+    )
 }

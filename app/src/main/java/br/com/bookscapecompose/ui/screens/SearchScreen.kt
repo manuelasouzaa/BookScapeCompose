@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookScapeList
 import br.com.bookscapecompose.ui.viewmodels.SearchViewModel
 
@@ -18,6 +19,7 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavController) {
 
     BackHandler { returnToMainScreen() }
     val list = viewModel.foundBooks.collectAsState()
+
     if (list.value.isNotEmpty()) {
         BookScapeList(
             returnClick = { returnToMainScreen() },
@@ -35,5 +37,10 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavController) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SearchScreenPreview() {
-//    SearchScreen(viewModel(), rememberNavController())
+    BookScapeList(
+        returnClick = {},
+        title = "Found books",
+        list = sampleList,
+        onClick = {}
+    )
 }

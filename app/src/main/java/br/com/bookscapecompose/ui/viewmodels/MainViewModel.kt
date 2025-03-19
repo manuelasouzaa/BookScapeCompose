@@ -2,7 +2,6 @@ package br.com.bookscapecompose.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.bookscapecompose.ui.navigation.UserPreferences
 import br.com.bookscapecompose.ui.repositories.BookRepository
 import br.com.bookscapecompose.ui.uistate.MainScreenUiState
 import kotlinx.coroutines.Dispatchers.IO
@@ -11,16 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MainViewModel(
-    private val bookRepository: BookRepository,
-    preferences: UserPreferences,
-) : ViewModel() {
+class MainViewModel(private val bookRepository: BookRepository) : ViewModel() {
 
     private val _uiState: MutableStateFlow<MainScreenUiState> =
         MutableStateFlow(MainScreenUiState())
     val uiState get() = _uiState.asStateFlow()
 
-    val loggedUser = preferences.state
     val apiAnswer = bookRepository.apiAnswer
 
     init {

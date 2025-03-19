@@ -31,8 +31,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
+import br.com.bookscapecompose.sampledata.sampleMainUiState
 import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.uistate.MainScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.ui.viewmodels.MainViewModel
 
@@ -42,15 +44,9 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
     BackHandler { navController.navigateUp() }
 
     val state by viewModel.uiState.collectAsState()
-    val loggedUser by viewModel.loggedUser.collectAsState(true)
     val googleApiAnswer by viewModel.apiAnswer.collectAsState()
     val context = LocalContext.current
-    val isLoading: Boolean = googleApiAnswer == ApiAnswer.Loading
-
-    LaunchedEffect(loggedUser) {
-        if (loggedUser == false)
-            navController.navigate("SignInScreen")
-    }
+    val isLoading = googleApiAnswer == ApiAnswer.Loading
 
     LaunchedEffect(googleApiAnswer) {
         when (googleApiAnswer) {
@@ -64,6 +60,21 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
         }
     }
 
+    MainScreenContent(
+        state = state,
+        navigate = { navController.navigate(it) },
+        isLoading = isLoading,
+        searchBooks = { viewModel.searchBooks(it) }
+    )
+}
+
+@Composable
+fun MainScreenContent(
+    state: MainScreenUiState,
+    navigate: (String) -> Unit,
+    isLoading: Boolean,
+    searchBooks: (String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,7 +107,7 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
             onSearchChange = state.onSearchChange,
             onClick = {
                 if (state.searchText.isNotEmpty()) {
-                    viewModel.searchBooks(state.searchText)
+                    searchBooks(state.searchText)
                 }
             }
         )
@@ -106,14 +117,14 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
 
         PersonalizedButton(
             modifier = Modifier.padding(top = 80.dp, bottom = 20.dp),
-            onClick = { navController.navigate("BookListScreen") },
+            onClick = { navigate("BookListScreen") },
             text = "My BookList",
             imageVector = Icons.AutoMirrored.Filled.List
         )
 
         PersonalizedButton(
             modifier = Modifier,
-            onClick = { navController.navigate("AccountScreen") },
+            onClick = { navigate("AccountScreen") },
             text = "My Account",
             imageVector = Icons.Default.AccountCircle
         )
@@ -123,5 +134,21 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MainScreenPreview() {
-//    MainScreen(viewModel(), rememberNavController())
+    MainScreenContent(
+        state = sampleMainUiState,
+        navigate = {},
+        searchBooks = {},
+        isLoading = false
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun MainScreenLoadingPreview() {
+    MainScreenContent(
+        state = sampleMainUiState,
+        navigate = {},
+        searchBooks = {},
+        isLoading = true
+    )
 }

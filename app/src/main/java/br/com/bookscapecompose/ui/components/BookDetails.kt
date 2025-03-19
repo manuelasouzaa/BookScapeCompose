@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
-import br.com.bookscapecompose.sampledata.book1
+import br.com.bookscapecompose.sampledata.sampleBook
 import coil3.compose.AsyncImage
 
 @Composable
@@ -137,12 +137,12 @@ fun BookDetails(
 private fun BookDetailsPreview() {
     BookDetails(
         returnClick = {},
-        bookImageUrl = book1.image.orEmpty(),
+        bookImageUrl = sampleBook.image.orEmpty(),
         bookmarkIcon = R.drawable.ic_added,
         purchaseButtonClick = {},
-        bookTitle = book1.title,
-        bookAuthors = book1.authors.orEmpty(),
-        bookDesc = book1.description.orEmpty(),
+        bookTitle = sampleBook.title,
+        bookAuthors = sampleBook.authors.orEmpty(),
+        bookDesc = sampleBook.description.orEmpty(),
         bookmarkIconClick = {}
     )
 }

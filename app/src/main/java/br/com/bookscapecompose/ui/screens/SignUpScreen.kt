@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
+import br.com.bookscapecompose.sampledata.sampleSignUpState
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.uistate.SignUpScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.SignUpMessage
 import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
 
@@ -75,6 +77,21 @@ fun SignUpScreen(
         }
     }
 
+    SignUpScreenContent(
+        uiState = state,
+        showToasts = { validateAndShowToasts() },
+        navigate = { navController.navigate(it)},
+        resetSignUpMessage = { viewModel.clearSignUpMessage() }
+    )
+}
+
+@Composable
+fun SignUpScreenContent(
+    uiState: SignUpScreenUiState,
+    showToasts: () -> Unit,
+    navigate: (String) -> Unit,
+    resetSignUpMessage: () -> Unit
+    ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -112,31 +129,31 @@ fun SignUpScreen(
                 color = MaterialTheme.colorScheme.secondary
             )
             BookScapeTextField(
-                value = state.email,
-                onValueChange = state.onEmailChange,
+                value = uiState.email,
+                onValueChange = uiState.onEmailChange,
                 label = "E-mail",
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Email,
                 isPassword = false
             )
             BookScapeTextField(
-                value = state.username,
-                onValueChange = state.onUsernameChange,
+                value = uiState.username,
+                onValueChange = uiState.onUsernameChange,
                 label = "Username",
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Text,
                 isPassword = false
             )
             BookScapeTextField(
-                value = state.password,
-                onValueChange = state.onPasswordChange,
+                value = uiState.password,
+                onValueChange = uiState.onPasswordChange,
                 label = "Password",
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Password,
                 isPassword = true
             )
             Button(
-                onClick = { validateAndShowToasts() },
+                onClick = { showToasts() },
                 content = {
                     Text(
                         text = "Sign Up",
@@ -158,8 +175,8 @@ fun SignUpScreen(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
                         .clickable {
-                            navController.navigate("SignInScreen")
-                            viewModel.clearSignUpMessage()
+                            navigate("SignInScreen")
+                            resetSignUpMessage()
                         }
                 )
             }
@@ -170,5 +187,10 @@ fun SignUpScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SignUpScreenPreview() {
-//    SignUpScreen(viewModel(), rememberNavController())
+    SignUpScreenContent(
+        uiState = sampleSignUpState,
+        showToasts = {},
+        navigate = {},
+        resetSignUpMessage = {}
+    )
 }

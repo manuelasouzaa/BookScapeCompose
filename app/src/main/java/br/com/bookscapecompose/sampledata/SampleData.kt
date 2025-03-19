@@ -1,8 +1,12 @@
 package br.com.bookscapecompose.sampledata
 
 import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.model.User
+import br.com.bookscapecompose.ui.uistate.MainScreenUiState
+import br.com.bookscapecompose.ui.uistate.SignInScreenUiState
+import br.com.bookscapecompose.ui.uistate.SignUpScreenUiState
 
-val book1: Book = Book(
+val sampleBook: Book = Book(
     id = "id",
     title = "Percy Jackson and the Olympians - The Lightning Thief",
     authors = "Rick Riordan",
@@ -12,5 +16,32 @@ val book1: Book = Book(
 )
 
 val sampleList: List<Book> = listOf(
-    book1, book1, book1, book1, book1, book1, book1, book1,
+    sampleBook, sampleBook, sampleBook, sampleBook, sampleBook, sampleBook, sampleBook, sampleBook,
+)
+
+val sampleUser: User = User(
+    userEmail = "user@gmail.com",
+    username = "username",
+    password = "password"
+)
+
+val sampleSignInState: SignInScreenUiState = SignInScreenUiState(
+    email = "user@gmail.com",
+    onEmailChange = {},
+    password = "password",
+    onPasswordChange = {}
+)
+
+val sampleSignUpState: SignUpScreenUiState = SignUpScreenUiState(
+    email = "user@gmail.com",
+    onEmailChange = {},
+    username = "username",
+    onUsernameChange = {},
+    password = "password",
+    onPasswordChange = {}
+)
+
+val sampleMainUiState: MainScreenUiState = MainScreenUiState(
+    searchText = "example",
+    onSearchChange = {}
 )

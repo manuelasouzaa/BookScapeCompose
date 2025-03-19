@@ -32,15 +32,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
+import br.com.bookscapecompose.sampledata.sampleSignInState
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.uistate.SignInScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.SignInMessage
 import br.com.bookscapecompose.ui.viewmodels.SignInViewModel
 
 @Composable
-fun SignInScreen(
-    viewModel: SignInViewModel,
-    navController: NavController,
-) {
+fun SignInScreen(viewModel: SignInViewModel, navController: NavController) {
+    
     BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
@@ -78,6 +78,21 @@ fun SignInScreen(
         }
     }
 
+    SignInScreenContent(
+        state = state,
+        authAndShowToasts = { validateAndShowToasts() },
+        navigate = { navController.navigate(it) },
+        resetSignInMessage = { viewModel.clearSignInMessage() }
+    )
+}
+
+@Composable
+fun SignInScreenContent(
+    state: SignInScreenUiState,
+    authAndShowToasts: () -> Unit,
+    navigate: (String) -> Unit,
+    resetSignInMessage: () -> Unit,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -96,9 +111,7 @@ fun SignInScreen(
                 text = stringResource(R.string.bookscape),
                 fontSize = 26.sp,
                 modifier = Modifier.padding(top = 16.dp),
-                fontFamily = FontFamily(
-                    listOf(Font(R.font.kavoon))
-                ),
+                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -113,9 +126,7 @@ fun SignInScreen(
             Text(
                 text = "Sign In",
                 fontSize = 34.sp,
-                fontFamily = FontFamily(
-                    listOf(Font(R.font.kavoon))
-                ),
+                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.secondary
             )
             BookScapeTextField(
@@ -135,7 +146,7 @@ fun SignInScreen(
                 isPassword = true
             )
             Button(
-                onClick = { validateAndShowToasts() },
+                onClick = { authAndShowToasts() },
                 content = {
                     Text(
                         text = "Sign In",
@@ -157,8 +168,8 @@ fun SignInScreen(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
                         .clickable {
-                            navController.navigate("SignUpScreen")
-                            viewModel.clearSignInMessage()
+                            navigate("SignUpScreen")
+                            resetSignInMessage()
                         }
                 )
             }
@@ -169,5 +180,10 @@ fun SignInScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun SignInScreenPreview() {
-//    SignInScreen(viewModel(), rememberNavController())
+    SignInScreenContent(
+        state = sampleSignInState,
+        authAndShowToasts = {},
+        navigate = {},
+        resetSignInMessage = {}
+    )
 }

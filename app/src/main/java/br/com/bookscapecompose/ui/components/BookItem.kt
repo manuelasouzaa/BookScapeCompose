@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.sampledata.book1
+import br.com.bookscapecompose.sampledata.sampleBook
 import coil3.compose.AsyncImage
 
 @Composable
@@ -89,5 +89,5 @@ fun BookItem(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BookItemPreview(modifier: Modifier = Modifier) {
-    BookItem(book = book1, onClick = {})
+    BookItem(book = sampleBook, onClick = {})
 }

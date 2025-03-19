@@ -43,7 +43,7 @@ val bookScapeModules: Module = module {
     }
 
     viewModel {
-        MainViewModel(get(), get())
+        MainViewModel(get())
     }
 
     viewModel {

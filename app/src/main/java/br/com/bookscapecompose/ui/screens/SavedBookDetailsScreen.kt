@@ -4,10 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -17,54 +18,55 @@ import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.components.BookScapeAlertDialog
-import br.com.bookscapecompose.ui.viewmodels.BookMessage
-import br.com.bookscapecompose.ui.viewmodels.SharedViewModel
-import kotlinx.coroutines.launch
+import br.com.bookscapecompose.ui.viewmodels.SavedBookDetailsViewModel
+import br.com.bookscapecompose.ui.viewmodels.SavedBookMessage
+import kotlinx.coroutines.runBlocking
 
 @Composable
-fun SavedBookDetailsScreen(
-    viewModel: SharedViewModel,
-    navController: NavController,
-) {
-    BackHandler {
-        navController.navigateUp()
-    }
+fun SavedBookDetailsScreen(viewModel: SavedBookDetailsViewModel, navController: NavController) {
+
+    BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val bookMessage = viewModel.bookMessage.collectAsState()
+    val savedBookMessage by viewModel.savedBookMessage.collectAsState()
     val openDialog = remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
     val bookmarkIcon =
-        if (bookMessage.value == BookMessage.AddedBook)
+        if (savedBookMessage == SavedBookMessage.AddedBook || savedBookMessage == SavedBookMessage.Initial)
             R.drawable.ic_remove
         else
             R.drawable.ic_add
 
-    val answer = viewModel.verifyClickedBookValue(context)
+    val answer = viewModel.verifySavedClickedBookValue()
 
-    fun deleteSavedBook() =
-        coroutineScope.launch {
-            val wasBookDeleted = viewModel.deleteBook(context)
-            when (wasBookDeleted) {
-                BookMessage.DeletedBook ->
-                    toast(context, "Book removed successfully")
+    LaunchedEffect(savedBookMessage) {
+        when (savedBookMessage) {
+            SavedBookMessage.DeletedBook ->
+                toast(context, "Book removed successfully")
 
-                BookMessage.Error ->
-                    toast(context, "An error occurred. Try again later.")
+            SavedBookMessage.NotSavedBook ->
+                toast(context, "Book removed successfully")
 
-                else -> {}
+            SavedBookMessage.Error -> {
+                toast(context, "An error occurred. Try again later.")
+                navController.navigate("MainScreen")
             }
-        }
 
-    fun addBookAgain() =
-        try {
-            coroutineScope.launch { viewModel.saveBook(context) }
-            toast(context, "Book added successfully!")
-        } catch (e: Exception) {
-            toast(context, "An error occurred. Try again later.")
+            SavedBookMessage.AddedBook ->
+                toast(context, "Book added successfully!")
+
+            else -> {}
         }
+    }
+
+    fun deleteBook() {
+        viewModel.deleteBook()
+    }
+
+    fun addBookAgain() {
+        runBlocking { viewModel.saveBook() }
+    }
 
     answer?.let {
         BookDetails(
@@ -80,9 +82,7 @@ fun SavedBookDetailsScreen(
             bookTitle = answer.title,
             bookAuthors = answer.authors ?: "",
             bookDesc = answer.description ?: "",
-            purchaseButtonClick = {
-                uriHandler.openUri(answer.link)
-            }
+            purchaseButtonClick = { uriHandler.openUri(answer.link) }
         )
     } ?: navController.navigate("MainScreen")
 
@@ -91,20 +91,17 @@ fun SavedBookDetailsScreen(
             buttonModifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 70.dp),
-            onDismissRequest = {
-                openDialog.value = false
-            },
+            onDismissRequest = { openDialog.value = false },
             onConfirmClick = {
-                deleteSavedBook()
+                deleteBook()
                 openDialog.value = false
             },
             confirmButtonText = "Remove",
-            onDismissClick = {
-                openDialog.value = false
-            },
+            onDismissClick = { openDialog.value = false },
             dismissButtonText = "Cancel",
             title = "Confirmation",
             text = "Do you really wish to remove this book from your list? This action cannot be undone."
         )
     }
+
 }

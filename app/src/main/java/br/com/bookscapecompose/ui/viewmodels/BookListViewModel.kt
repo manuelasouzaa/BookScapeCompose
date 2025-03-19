@@ -17,28 +17,19 @@ class BookListViewModel(private val savedBookRepository: SavedBookRepository) : 
     private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
-    init {
-        viewModelScope.launch(IO) {
-            savedBookRepository.clearClickedBook()
-        }
-    }
-
     fun showBooks() {
         viewModelScope.launch {
             _loading.emit(true)
 
-            runBlocking { loadingSavedBooks() }
+            runBlocking { savedBookRepository.showBooks() }
 
             _loading.emit(false)
         }
     }
 
-    private suspend fun loadingSavedBooks(): List<Book?> {
-        return savedBookRepository.showBooks()
-    }
-
     fun sendBook(book: Book) {
         viewModelScope.launch(IO) {
+            savedBookRepository.clearBookMessage()
             savedBookRepository.sendBook(book)
         }
     }

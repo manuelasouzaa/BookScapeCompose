@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,21 +21,21 @@ fun BookListScreen(bookListViewModel: BookListViewModel, navController: NavContr
 
     BackHandler { navController.navigateUp() }
 
-    val loading = bookListViewModel.loading.collectAsState()
-    val books = bookListViewModel.bookList.collectAsState()
+    val loading by bookListViewModel.loading.collectAsState()
+    val books by bookListViewModel.bookList.collectAsState()
 
     bookListViewModel.showBooks()
 
-    if (loading.value)
+    if (loading)
         Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
             CircularProgressIndicator(modifier = Modifier)
         }
 
-    if (!loading.value)
+    if (!loading)
         BookScapeList(
             returnClick = { navController.navigateUp() },
             title = "My BookList",
-            list = books.value,
+            list = books,
             onClick = {
                 runBlocking { bookListViewModel.sendBook(it) }
                 navController.navigate("SavedBookDetailsScreen")

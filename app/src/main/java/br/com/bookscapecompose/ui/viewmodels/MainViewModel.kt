@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val bookRepository: BookRepository,
@@ -40,8 +39,8 @@ class MainViewModel(
         }
     }
 
-    suspend fun searchBooks(searchText: String) {
-        withContext(IO) {
+    fun searchBooks(searchText: String) {
+        viewModelScope.launch(IO) {
             bookRepository.updateApiAnswerState(ApiAnswer.Loading)
             searchingBooks(searchText)
         }

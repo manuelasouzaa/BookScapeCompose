@@ -1,6 +1,7 @@
 package br.com.bookscapecompose.ui.repositories
 
 import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.ui.viewmodels.SavedBookMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -8,6 +9,7 @@ interface SavedBookRepository {
 
     val clickedBook: StateFlow<Book?>
     val bookList: StateFlow<List<Book?>>
+    val savedBookMessage: StateFlow<SavedBookMessage>
     val userEmail: Flow<String?>
 
     suspend fun sendBook(book: Book)
@@ -16,8 +18,12 @@ interface SavedBookRepository {
 
     suspend fun deleteBook()
 
-    suspend fun verifyIfBookIsSaved(): Boolean
+    suspend fun verifyIfBookIsSaved()
 
     suspend fun clearClickedBook()
+
+    suspend fun clearBookMessage()
+
+    suspend fun saveBook()
 
 }

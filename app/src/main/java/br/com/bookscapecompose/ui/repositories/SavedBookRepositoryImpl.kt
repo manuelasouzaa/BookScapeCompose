@@ -1,14 +1,18 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
+import android.util.Log
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
 import br.com.bookscapecompose.ui.navigation.UserPreferences
+import br.com.bookscapecompose.ui.viewmodels.SavedBookMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import java.util.UUID
 
 class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context) :
     SavedBookRepository {
@@ -21,6 +25,10 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
 
     private val _bookList: MutableStateFlow<List<Book?>> = MutableStateFlow(emptyList())
     override val bookList = _bookList.asStateFlow()
+
+    private val _savedBookMessage: MutableStateFlow<SavedBookMessage> =
+        MutableStateFlow(SavedBookMessage.Initial)
+    override val savedBookMessage = _savedBookMessage.asStateFlow()
 
     override suspend fun sendBook(book: Book) {
         _clickedBook.emit(book)
@@ -53,35 +61,64 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
         userEmail.first()?.let { userEmail ->
             clickedBook.value?.let { book ->
                 val savedBook = fetchBook(book.id, userEmail)
-                bookDao.deleteSavedBook(savedBook)
+                try {
+                    bookDao.deleteSavedBook(savedBook)
+                    _savedBookMessage.emit(SavedBookMessage.DeletedBook)
+                } catch (e: Exception) {
+                    Log.e("ERROR", "deleteBook: exception", e)
+                    _savedBookMessage.emit(SavedBookMessage.Error)
+                }
             }
         }
     }
 
-    override suspend fun verifyIfBookIsSaved(): Boolean {
-        return clickedBook.value?.let { clickedBook ->
-            verification(clickedBook)
-        } ?: false
+    override suspend fun verifyIfBookIsSaved() {
+        clickedBook.value?.let { clickedBook ->
+            userEmail.first()?.let { userEmail ->
+                val isBookSaved = runBlocking { verification(clickedBook, userEmail) }
+                if (!isBookSaved && savedBookMessage.value != SavedBookMessage.DeletedBook)
+                    _savedBookMessage.emit(SavedBookMessage.Error)
+            }
+        }
     }
 
-    private suspend fun verification(clickedBook: Book): Boolean {
-        var existentBook: SavedBook? = null
-
-        userEmail.first()?.let { userEmail ->
-            existentBook = if (userEmail != "") {
-                bookDao.verifyIfBookIsSaved(clickedBook.id, userEmail)
-            } else null
-        }
-
+    private suspend fun verification(clickedBook: Book, userEmail: String): Boolean {
+        val existentBook = bookDao.verifyIfBookIsSaved(clickedBook.id, userEmail)
         return existentBook != null
     }
 
     private suspend fun fetchBook(bookId: String, userEmail: String): SavedBook {
-        val savedBook = bookDao.fetchSavedBook(bookId, userEmail)
-        return savedBook
+        return bookDao.fetchSavedBook(bookId, userEmail)
     }
 
     override suspend fun clearClickedBook() {
         _clickedBook.emit(null)
+    }
+
+    override suspend fun clearBookMessage() {
+        _savedBookMessage.emit(SavedBookMessage.Initial)
+    }
+
+    override suspend fun saveBook() {
+        userEmail.first()?.let { userEmail ->
+            clickedBook.value?.let { book ->
+                val savedBook = SavedBook(
+                    savedBookId = UUID.randomUUID().toString(),
+                    userEmail = userEmail,
+                    bookTitle = book.title,
+                    bookAuthor = book.authors ?: "",
+                    bookDescription = book.description ?: "",
+                    bookImage = book.image ?: "",
+                    bookApiId = book.id,
+                    bookLink = book.link
+                )
+                try {
+                    bookDao.saveBook(savedBook)
+                    _savedBookMessage.emit(SavedBookMessage.AddedBook)
+                } catch (e: Exception) {
+                    _savedBookMessage.emit(SavedBookMessage.Error)
+                }
+            }
+        }
     }
 }

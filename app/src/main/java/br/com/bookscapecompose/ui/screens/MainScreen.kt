@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +35,6 @@ import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
 import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.ui.viewmodels.MainViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(viewModel: MainViewModel, navController: NavController) {
@@ -46,7 +44,6 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
     val state by viewModel.uiState.collectAsState()
     val loggedUser by viewModel.loggedUser.collectAsState(true)
     val googleApiAnswer by viewModel.apiAnswer.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val isLoading: Boolean = googleApiAnswer == ApiAnswer.Loading
 
@@ -99,9 +96,7 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
             onSearchChange = state.onSearchChange,
             onClick = {
                 if (state.searchText.isNotEmpty()) {
-                    coroutineScope.launch {
-                        viewModel.searchBooks(state.searchText)
-                    }
+                    viewModel.searchBooks(state.searchText)
                 }
             }
         )

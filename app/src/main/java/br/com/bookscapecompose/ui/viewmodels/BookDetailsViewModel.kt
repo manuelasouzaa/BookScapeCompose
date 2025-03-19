@@ -65,6 +65,4 @@ sealed class BookMessage {
     data object AddedBook : BookMessage()
     data object NotSavedBook : BookMessage()
     data object Error : BookMessage()
-    data object DeletedBook : BookMessage()
-    data object UserNotLogged : BookMessage()
 }

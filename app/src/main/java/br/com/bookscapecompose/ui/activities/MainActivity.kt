@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                     ) {
                         val navController = rememberNavController()
-
                         BookScapeNavHost(navController)
                     }
                 }

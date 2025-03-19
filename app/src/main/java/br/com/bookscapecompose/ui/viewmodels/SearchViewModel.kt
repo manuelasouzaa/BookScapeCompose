@@ -1,20 +1,13 @@
 package br.com.bookscapecompose.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import br.com.bookscapecompose.model.Book
-import br.com.bookscapecompose.ui.navigation.UserPreferences
 import br.com.bookscapecompose.ui.repositories.BookRepository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
-class SearchViewModel(
-    private val bookRepository: BookRepository,
-    preferences: UserPreferences,
-) : ViewModel() {
-
-    val userEmail = preferences.userEmail.asLiveData()
+class SearchViewModel(private val bookRepository: BookRepository) : ViewModel() {
 
     val foundBooks = bookRepository.foundBooks
 

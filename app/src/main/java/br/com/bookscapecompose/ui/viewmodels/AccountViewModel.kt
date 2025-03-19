@@ -8,16 +8,13 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class AccountViewModel(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _loading: MutableStateFlow<Boolean> =
-        MutableStateFlow(true)
+    private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val loading = _loading.asStateFlow()
 
-    private val _user: MutableStateFlow<User?> =
-        MutableStateFlow(null)
+    private val _user: MutableStateFlow<User?> = MutableStateFlow(null)
     val user = _user.asStateFlow()
 
     fun account() {
@@ -27,10 +24,8 @@ class AccountViewModel(private val userRepository: UserRepository) : ViewModel()
         }
     }
 
-    private fun searchingUser() {
-        runBlocking {
-            _user.emit(userRepository.fetchUserByEmailPreference())
-        }
+    private suspend fun searchingUser() {
+        _user.emit(userRepository.fetchUserByEmailPreference())
     }
 
     fun logout() {

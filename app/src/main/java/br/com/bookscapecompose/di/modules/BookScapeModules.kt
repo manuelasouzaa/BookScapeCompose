@@ -47,7 +47,7 @@ val bookScapeModules: Module = module {
     }
 
     viewModel {
-        SearchViewModel(get(), get())
+        SearchViewModel(get())
     }
 
     viewModel {

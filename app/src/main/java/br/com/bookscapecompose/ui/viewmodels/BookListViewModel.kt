@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class BookListViewModel(private val savedBookRepository: SavedBookRepository) : ViewModel() {
 
@@ -20,9 +19,7 @@ class BookListViewModel(private val savedBookRepository: SavedBookRepository) : 
     fun showBooks() {
         viewModelScope.launch {
             _loading.emit(true)
-
-            runBlocking { savedBookRepository.showBooks() }
-
+                savedBookRepository.showBooks()
             _loading.emit(false)
         }
     }

@@ -6,7 +6,6 @@ import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.ui.repositories.SavedBookRepository
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class SavedBookDetailsViewModel(private val repository: SavedBookRepository) : ViewModel() {
 
@@ -15,24 +14,23 @@ class SavedBookDetailsViewModel(private val repository: SavedBookRepository) : V
     fun verifySavedClickedBookValue(): Book? =
         repository.clickedBook.value?.let { book ->
             viewModelScope.launch(IO) {
-                runBlocking { repository.verifyIfBookIsSaved() }
+                repository.verifyIfBookIsSaved()
             }
             return book
         }
 
-    fun deleteBook(): SavedBookMessage {
+    fun deleteBook() {
         viewModelScope.launch(IO) {
-            runBlocking { repository.deleteBook() }
+            repository.deleteBook()
         }
-        return savedBookMessage.value
     }
 
-    fun saveBook(): SavedBookMessage {
+    fun saveBook() {
         viewModelScope.launch(IO) {
-            runBlocking { repository.saveBook() }
+            repository.saveBook()
         }
-        return savedBookMessage.value
     }
+
 }
 
 sealed class SavedBookMessage {

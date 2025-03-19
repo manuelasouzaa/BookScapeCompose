@@ -1,7 +1,6 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
-import android.util.Log
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context) :
@@ -65,7 +63,6 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
                     bookDao.deleteSavedBook(savedBook)
                     _savedBookMessage.emit(SavedBookMessage.DeletedBook)
                 } catch (e: Exception) {
-                    Log.e("ERROR", "deleteBook: exception", e)
                     _savedBookMessage.emit(SavedBookMessage.Error)
                 }
             }
@@ -75,7 +72,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
     override suspend fun verifyIfBookIsSaved() {
         clickedBook.value?.let { clickedBook ->
             userEmail.first()?.let { userEmail ->
-                val isBookSaved = runBlocking { verification(clickedBook, userEmail) }
+                val isBookSaved = verification(clickedBook, userEmail)
                 if (!isBookSaved && savedBookMessage.value != SavedBookMessage.DeletedBook)
                     _savedBookMessage.emit(SavedBookMessage.Error)
             }

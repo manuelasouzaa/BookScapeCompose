@@ -11,7 +11,6 @@ import br.com.bookscapecompose.web.retrofit.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookRepository {
@@ -94,9 +93,7 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
                     bookApiId = book.id,
                     bookLink = book.link
                 )
-                runBlocking {
-                    bookDao.saveBook(savedBook)
-                }
+                bookDao.saveBook(savedBook)
             }
             true
         } ?: false

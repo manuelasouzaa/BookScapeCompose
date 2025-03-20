@@ -13,13 +13,12 @@ class BookListViewModel(private val savedBookRepository: SavedBookRepository) : 
 
     val bookList = savedBookRepository.bookList
 
-    private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val loading = _loading.asStateFlow()
 
     fun showBooks() {
         viewModelScope.launch {
-            _loading.emit(true)
-                savedBookRepository.showBooks()
+            savedBookRepository.showBooks()
             _loading.emit(false)
         }
     }

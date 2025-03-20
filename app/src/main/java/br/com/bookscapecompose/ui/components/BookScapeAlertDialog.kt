@@ -1,24 +1,22 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 
 @Composable
 fun BookScapeAlertDialog(
-    modifier: Modifier = Modifier.wrapContentSize(align = Alignment.Center),
+    modifier: Modifier = Modifier,
     buttonModifier: Modifier,
     onDismissRequest: () -> Unit,
     onConfirmClick: () -> Unit,
@@ -51,9 +49,7 @@ fun BookScapeAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 5.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium
             )
         },
         text = {
@@ -64,7 +60,7 @@ fun BookScapeAlertDialog(
                         .fillMaxWidth()
                         .padding(horizontal = 5.dp),
                     textAlign = TextAlign.Center,
-                    fontSize = 18.sp
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
         },
@@ -75,20 +71,42 @@ fun BookScapeAlertDialog(
     )
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 private fun BookScapeAlertDialogPreview() {
-    BookScapeAlertDialog(
-        buttonModifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp),
-        modifier = Modifier.padding(20.dp),
-        onDismissRequest = {},
-        onConfirmClick = {},
-        confirmButtonText = "Confirm button",
-        onDismissClick = {},
-        dismissButtonText = "Dismiss button",
-        title = "Alert Dialog",
-        text = "Alert Dialog preview text"
-    )
+    BookScapeComposeTheme {
+        BookScapeAlertDialog(
+            buttonModifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            modifier = Modifier.padding(20.dp),
+            onDismissRequest = {},
+            onConfirmClick = {},
+            confirmButtonText = "Confirm button",
+            onDismissClick = {},
+            dismissButtonText = "Dismiss button",
+            title = "Alert Dialog",
+            text = "Alert Dialog preview text"
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapeAlertDialogDarkThemePreview() {
+    BookScapeComposeTheme {
+        BookScapeAlertDialog(
+            buttonModifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            modifier = Modifier.padding(20.dp),
+            onDismissRequest = {},
+            onConfirmClick = {},
+            confirmButtonText = "Confirm button",
+            onDismissClick = {},
+            dismissButtonText = "Dismiss button",
+            title = "Alert Dialog",
+            text = "Alert Dialog preview text"
+        )
+    }
 }

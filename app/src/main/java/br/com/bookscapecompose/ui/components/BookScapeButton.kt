@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -9,14 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 
 @Composable
 fun BookScapeButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    buttonText: String
-    ) {
+    buttonText: String,
+) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
@@ -26,15 +27,26 @@ fun BookScapeButton(
     ) {
         Text(
             text = buttonText,
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(5.dp)
         )
     }
 }
 
-@Preview
+
+@Preview(showBackground = true)
+@Composable
+private fun BookScapeButtonLightThemePreview() {
+    BookScapeComposeTheme {
+        BookScapeButton(onClick = {}, buttonText = "Button text")
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun BookScapeButtonPreview() {
-    BookScapeButton(onClick = {}, buttonText = "Button text")
+    BookScapeComposeTheme {
+        BookScapeButton(onClick = {}, buttonText = "Button text")
+    }
 }

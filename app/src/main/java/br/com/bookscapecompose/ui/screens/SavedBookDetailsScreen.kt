@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,6 +25,7 @@ import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleBook
 import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.components.BookScapeAlertDialog
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.viewmodels.SavedBookDetailsViewModel
 import br.com.bookscapecompose.ui.viewmodels.SavedBookMessage
 
@@ -47,30 +50,34 @@ fun SavedBookDetailsScreen(viewModel: SavedBookDetailsViewModel, navController: 
     LaunchedEffect(savedBookMessage) {
         when (savedBookMessage) {
             SavedBookMessage.DeletedBook ->
-                toast(context, "Book removed successfully")
+                toast(context, context.getString(R.string.book_successfully_removed))
 
             SavedBookMessage.NotSavedBook ->
-                toast(context, "Book removed successfully")
+                toast(context, context.getString(R.string.book_successfully_removed))
 
             SavedBookMessage.Error -> {
-                toast(context, "An error occurred. Try again later.")
+                toast(context, context.getString(R.string.an_error_occurred))
                 navController.navigate("MainScreen")
             }
 
             SavedBookMessage.AddedBook ->
-                toast(context, "Book added successfully!")
+                toast(context, context.getString(R.string.book_successfully_added))
 
             else -> {}
         }
     }
+
+    fun saveBook() = { viewModel.saveBook() }
+
+    fun deleteBook() = { viewModel.deleteBook() }
 
     SavedBookDetailsScreenContent(
         answer = answer,
         returnClick = { navController.navigateUp() },
         icon = bookmarkIcon,
         openDialog = openDialog,
-        addBook = { viewModel.saveBook() },
-        deleteBook = { viewModel.deleteBook() },
+        addBook = { saveBook() },
+        deleteBook = { deleteBook() },
         uriHandler = uriHandler,
         navigate = { navController.navigate(it) }
     )
@@ -115,41 +122,79 @@ fun SavedBookDetailsScreenContent(
                 deleteBook()
                 openDialog.value = false
             },
-            confirmButtonText = "Remove",
+            confirmButtonText = stringResource(R.string.remove),
             onDismissClick = { openDialog.value = false },
-            dismissButtonText = "Cancel",
-            title = "Confirmation",
-            text = "Do you really wish to remove this book from your list? This action cannot be undone."
+            dismissButtonText = stringResource(R.string.cancel),
+            title = stringResource(R.string.confirmation),
+            text = stringResource(R.string.confirmation_remove_book)
         )
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun SavedBookDetailsPreview() {
-    SavedBookDetailsScreenContent(
-        answer = sampleBook,
-        returnClick = { true },
-        icon = R.drawable.ic_remove,
-        openDialog = remember { mutableStateOf(false) },
-        addBook = {},
-        deleteBook = {},
-        uriHandler = LocalUriHandler.current,
-        navigate = {}
-    )
+private fun SavedBookDetailsLightThemePreview() {
+    BookScapeComposeTheme {
+        SavedBookDetailsScreenContent(
+            answer = sampleBook,
+            returnClick = { true },
+            icon = R.drawable.ic_remove,
+            openDialog = remember { mutableStateOf(false) },
+            addBook = {},
+            deleteBook = {},
+            uriHandler = LocalUriHandler.current,
+            navigate = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun SavedBookDetailsOpenDialogPreview() {
-    SavedBookDetailsScreenContent(
-        answer = sampleBook,
-        returnClick = { true },
-        icon = R.drawable.ic_remove,
-        openDialog = remember { mutableStateOf(true) },
-        addBook = {},
-        deleteBook = {},
-        uriHandler = LocalUriHandler.current,
-        navigate = {}
-    )
+private fun SavedBookDetailsOpenDialogLightThemePreview() {
+    BookScapeComposeTheme {
+        SavedBookDetailsScreenContent(
+            answer = sampleBook,
+            returnClick = { true },
+            icon = R.drawable.ic_remove,
+            openDialog = remember { mutableStateOf(true) },
+            addBook = {},
+            deleteBook = {},
+            uriHandler = LocalUriHandler.current,
+            navigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SavedBookDetailsDarkThemePreview() {
+    BookScapeComposeTheme {
+        SavedBookDetailsScreenContent(
+            answer = sampleBook,
+            returnClick = { true },
+            icon = R.drawable.ic_remove,
+            openDialog = remember { mutableStateOf(false) },
+            addBook = {},
+            deleteBook = {},
+            uriHandler = LocalUriHandler.current,
+            navigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SavedBookDetailsOpenDialogDarkThemePreview() {
+    BookScapeComposeTheme {
+        SavedBookDetailsScreenContent(
+            answer = sampleBook,
+            returnClick = { true },
+            icon = R.drawable.ic_remove,
+            openDialog = remember { mutableStateOf(true) },
+            addBook = {},
+            deleteBook = {},
+            uriHandler = LocalUriHandler.current,
+            navigate = {}
+        )
+    }
 }

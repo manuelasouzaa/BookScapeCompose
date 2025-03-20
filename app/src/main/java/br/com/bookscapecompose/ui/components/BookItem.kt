@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,14 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleBook
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import coil3.compose.AsyncImage
 
 @Composable
@@ -66,9 +66,8 @@ fun BookItem(
         ) {
             Text(
                 text = book.title,
-                fontSize = 21.sp,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
@@ -76,7 +75,7 @@ fun BookItem(
 
             Text(
                 text = book.authors.orEmpty(),
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onTertiary,
                 modifier = Modifier.padding(top = 10.dp),
                 maxLines = 2,
@@ -86,8 +85,18 @@ fun BookItem(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-fun BookItemPreview(modifier: Modifier = Modifier) {
-    BookItem(book = sampleBook, onClick = {})
+fun BookItemLightModePreview() {
+    BookScapeComposeTheme {
+        BookItem(book = sampleBook, onClick = {})
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun BookItemDarkModePreview() {
+    BookScapeComposeTheme {
+        BookItem(book = sampleBook, onClick = {})
+    }
 }

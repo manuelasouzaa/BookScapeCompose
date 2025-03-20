@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -7,6 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookScapeList
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.viewmodels.SearchViewModel
 
 @Composable
@@ -34,13 +36,28 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavController) {
 
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun SearchScreenPreview() {
-    BookScapeList(
-        returnClick = {},
-        title = "Found books",
-        list = sampleList,
-        onClick = {}
-    )
+private fun SearchScreenLightThemePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "Found books",
+            list = sampleList,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SearchScreenDarkThemePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "Found books",
+            list = sampleList,
+            onClick = {}
+        )
+    }
 }

@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,18 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.sampledata.sampleSignUpState
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.uistate.SignUpScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.SignUpMessage
 import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
@@ -46,41 +45,41 @@ fun SignUpScreen(
     BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
-    val state by viewModel.uiState.collectAsState()
-    val message by viewModel.signUpMessage.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val signUpMessage by viewModel.signUpMessage.collectAsState()
 
     fun validateAndShowToasts() {
         viewModel.addNewUser(
-            email = state.email,
-            username = state.username,
-            password = state.password
+            email = uiState.email,
+            username = uiState.username,
+            password = uiState.password
         )
     }
 
-    LaunchedEffect(message) {
-        when (message) {
+    LaunchedEffect(signUpMessage) {
+        when (signUpMessage) {
             SignUpMessage.Initial -> {}
 
             SignUpMessage.Error ->
-                toast(context, "An error occurred. Please try again")
+                toast(context, context.getString(R.string.an_error_occurred_please_try_again))
 
             SignUpMessage.MissingInformation ->
-                toast(context, "Please, complete the missing fields!")
+                toast(context, context.getString(R.string.missing_fields))
 
             SignUpMessage.UserIsAlreadyAdded ->
-                toast(context, "You're already signed up. Please log in")
+                toast(context, context.getString(R.string.already_signed_up))
 
             SignUpMessage.UserSuccessfullyAdded -> {
-                toast(context, "User added successfully!")
+                toast(context, context.getString(R.string.user_added_successfully))
                 navController.navigate("SignInScreen")
             }
         }
     }
 
     SignUpScreenContent(
-        uiState = state,
+        uiState = uiState,
         showToasts = { validateAndShowToasts() },
-        navigate = { navController.navigate(it)},
+        navigate = { navController.navigate(it) },
         resetSignUpMessage = { viewModel.clearSignUpMessage() }
     )
 }
@@ -90,10 +89,12 @@ fun SignUpScreenContent(
     uiState: SignUpScreenUiState,
     showToasts: () -> Unit,
     navigate: (String) -> Unit,
-    resetSignUpMessage: () -> Unit
-    ) {
+    resetSignUpMessage: () -> Unit,
+) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -107,25 +108,22 @@ fun SignUpScreenContent(
                 modifier = Modifier.fillMaxWidth(.6f),
             )
             Text(
-                text = stringResource(R.string.bookscape),
-                fontSize = 26.sp,
+                text = stringResource(R.string.book_scape),
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(top = 16.dp),
-                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Sign Up",
-                fontSize = 34.sp,
-                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
+                text = stringResource(R.string.sign_up_title),
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
             BookScapeTextField(
@@ -157,20 +155,19 @@ fun SignUpScreenContent(
                 content = {
                     Text(
                         text = "Sign Up",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
-                        fontSize = 18.sp
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             )
             Row {
                 Text(
                     text = "Already have an account? ",
-                    fontSize = 15.sp
+                    style = MaterialTheme.typography.labelSmall
                 )
                 Text(
                     text = "Sign in",
-                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
@@ -184,13 +181,28 @@ fun SignUpScreenContent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun SignUpScreenPreview() {
-    SignUpScreenContent(
-        uiState = sampleSignUpState,
-        showToasts = {},
-        navigate = {},
-        resetSignUpMessage = {}
-    )
+private fun SignUpScreenLightModePreview() {
+    BookScapeComposeTheme {
+        SignUpScreenContent(
+            uiState = sampleSignUpState,
+            showToasts = {},
+            navigate = {},
+            resetSignUpMessage = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SignUpScreenDarkModePreview() {
+    BookScapeComposeTheme {
+        SignUpScreenContent(
+            uiState = sampleSignUpState,
+            showToasts = {},
+            navigate = {},
+            resetSignUpMessage = {}
+        )
+    }
 }

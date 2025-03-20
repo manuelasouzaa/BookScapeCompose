@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,11 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.model.User
 import br.com.bookscapecompose.sampledata.sampleUser
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.viewmodels.AccountViewModel
 
 @Composable
@@ -74,7 +75,7 @@ fun AccountScreenContent(
     user: State<User?>,
     returnClick: () -> Boolean,
     logout: () -> Unit,
-    navigate: (String) -> Unit
+    navigate: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -147,8 +148,7 @@ fun AccountScreenContent(
                     ) {
                         Text(
                             text = loggedUser.username,
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.padding(16.dp),
                             maxLines = 1,
@@ -168,7 +168,7 @@ fun AccountScreenContent(
                     ) {
                         Text(
                             text = "E-mail",
-                            fontSize = 22.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.padding(top = 50.dp, bottom = 5.dp)
@@ -176,7 +176,7 @@ fun AccountScreenContent(
 
                         Text(
                             text = loggedUser.userEmail,
-                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onTertiary,
                             modifier = Modifier.padding(
                                 top = 16.dp,
@@ -204,7 +204,7 @@ fun AccountScreenContent(
                         ) {
                             Text(
                                 text = "My BookList",
-                                fontSize = 20.sp,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(5.dp)
                             )
@@ -225,26 +225,58 @@ fun AccountScreenContent(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun AccountScreenPreview() {
-    AccountScreenContent(
-        isLoading = false,
-        user = remember { mutableStateOf(sampleUser) },
-        returnClick = { true },
-        logout = {},
-        navigate = {}
-    )
+private fun AccountScreenLightThemePreview() {
+    BookScapeComposeTheme {
+        AccountScreenContent(
+            isLoading = false,
+            user = remember { mutableStateOf(sampleUser) },
+            returnClick = { true },
+            logout = {},
+            navigate = {}
+        )
+    }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun AccountScreenLoadingPreview() {
-    AccountScreenContent(
-        isLoading = true,
-        user = remember { mutableStateOf(sampleUser) },
-        returnClick = { true },
-        logout = {},
-        navigate = {}
-    )
+private fun AccountScreenLoadingLightThemePreview() {
+    BookScapeComposeTheme {
+        AccountScreenContent(
+            isLoading = true,
+            user = remember { mutableStateOf(sampleUser) },
+            returnClick = { true },
+            logout = {},
+            navigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AccountScreenDarkThemePreview() {
+    BookScapeComposeTheme {
+        AccountScreenContent(
+            isLoading = false,
+            user = remember { mutableStateOf(sampleUser) },
+            returnClick = { true },
+            logout = {},
+            navigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AccountScreenLoadingDarkThemePreview() {
+    BookScapeComposeTheme {
+        AccountScreenContent(
+            isLoading = true,
+            user = remember { mutableStateOf(sampleUser) },
+            returnClick = { true },
+            logout = {},
+            navigate = {}
+        )
+    }
 }

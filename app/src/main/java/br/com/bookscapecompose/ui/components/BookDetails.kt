@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,13 +27,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.sampledata.sampleBook
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import coil3.compose.AsyncImage
 
 @Composable
@@ -49,12 +48,13 @@ fun BookDetails(
     Column(
         Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState()),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
@@ -96,24 +96,22 @@ fun BookDetails(
         ) {
             Text(
                 text = bookTitle,
-                fontSize = 27.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onTertiary,
-                textAlign = TextAlign.Center
+                modifier = Modifier.padding(16.dp)
             )
 
             Text(
                 text = bookAuthors,
-                fontSize = 23.sp,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
+                modifier = Modifier.padding(16.dp)
             )
 
             Text(
                 text = bookDesc,
-                fontSize = 22.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onTertiary,
-                textAlign = TextAlign.Justify,
                 modifier = Modifier.padding(
                     top = 16.dp,
                     start = 16.dp,
@@ -134,15 +132,34 @@ fun BookDetails(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun BookDetailsPreview() {
-    BookDetails(
-        returnClick = {},
-        bookImageUrl = sampleBook.image.orEmpty(),
-        bookmarkIcon = R.drawable.ic_added,
-        purchaseButtonClick = {},
-        bookTitle = sampleBook.title,
-        bookAuthors = sampleBook.authors.orEmpty(),
-        bookDesc = sampleBook.description.orEmpty(),
-        bookmarkIconClick = {}
-    )
+private fun BookDetailsLightThemePreview() {
+    BookScapeComposeTheme {
+        BookDetails(
+            returnClick = {},
+            bookImageUrl = sampleBook.image.orEmpty(),
+            bookmarkIcon = R.drawable.ic_added,
+            purchaseButtonClick = {},
+            bookTitle = sampleBook.title,
+            bookAuthors = sampleBook.authors.orEmpty(),
+            bookDesc = sampleBook.description.orEmpty(),
+            bookmarkIconClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookDetailsDarkThemePreview() {
+    BookScapeComposeTheme {
+        BookDetails(
+            returnClick = {},
+            bookImageUrl = sampleBook.image.orEmpty(),
+            bookmarkIcon = R.drawable.ic_added,
+            purchaseButtonClick = {},
+            bookTitle = sampleBook.title,
+            bookAuthors = sampleBook.authors.orEmpty(),
+            bookDesc = sampleBook.description.orEmpty(),
+            bookmarkIconClick = {}
+        )
+    }
 }

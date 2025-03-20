@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,79 +23,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.sampledata.sampleSignInState
 import br.com.bookscapecompose.ui.components.BookScapeTextField
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.uistate.SignInScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.SignInMessage
 import br.com.bookscapecompose.ui.viewmodels.SignInViewModel
 
 @Composable
 fun SignInScreen(viewModel: SignInViewModel, navController: NavController) {
-    
+
     BackHandler { navController.navigateUp() }
 
     val context = LocalContext.current
-    val state by viewModel.uiState.collectAsState()
-    val message by viewModel.signInMessage.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val signInMessage by viewModel.signInMessage.collectAsState()
 
     fun validateAndShowToasts() {
-        if (state.email.isEmpty() || state.password.isEmpty()) {
-            toast(context, "Please, complete the missing fields")
+        if (uiState.email.isEmpty() || uiState.password.isEmpty()) {
+            toast(context, context.getString(R.string.missing_fields))
         } else {
-            viewModel.authenticate(state.email, state.password)
+            viewModel.authenticate(uiState.email, uiState.password)
         }
     }
 
-    LaunchedEffect(message) {
-        when (message) {
+    LaunchedEffect(signInMessage) {
+        when (signInMessage) {
             SignInMessage.UserLoggedIn -> {
-                toast(context, "Logged in successfully!")
+                toast(context, context.getString(R.string.logged_in))
                 navController.navigate("MainScreen")
             }
 
             SignInMessage.Error ->
-                toast(context, "An error occurred. Please try again")
+                toast(context, context.getString(R.string.an_error_occurred_please_try_again))
 
             SignInMessage.MissingInformation ->
-                toast(context, "Please complete the missing fields")
+                toast(context, context.getString(R.string.missing_fields))
 
             SignInMessage.WrongPassword ->
-                toast(context, "Incorrect password. Please try again!")
+                toast(context, context.getString(R.string.incorrect_password))
 
             SignInMessage.UserDoesNotExist ->
-                toast(context, "User not found. Please sign up")
+                toast(context, context.getString(R.string.user_not_found))
 
             SignInMessage.Initial -> {}
         }
     }
 
+    fun clearSignInMessage() = { viewModel.clearSignInMessage() }
+
     SignInScreenContent(
-        state = state,
+        uiState = uiState,
         authAndShowToasts = { validateAndShowToasts() },
         navigate = { navController.navigate(it) },
-        resetSignInMessage = { viewModel.clearSignInMessage() }
+        resetSignInMessage = { clearSignInMessage() }
     )
 }
 
 @Composable
 fun SignInScreenContent(
-    state: SignInScreenUiState,
+    uiState: SignInScreenUiState,
     authAndShowToasts: () -> Unit,
     navigate: (String) -> Unit,
     resetSignInMessage: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -108,39 +111,36 @@ fun SignInScreenContent(
                 modifier = Modifier.fillMaxWidth(.6f),
             )
             Text(
-                text = stringResource(R.string.bookscape),
-                fontSize = 26.sp,
+                text = stringResource(R.string.book_scape),
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(top = 16.dp),
-                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Sign In",
-                fontSize = 34.sp,
-                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
+                text = stringResource(R.string.sign_in),
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
             BookScapeTextField(
-                value = state.email,
-                onValueChange = state.onEmailChange,
-                label = "E-mail",
+                value = uiState.email,
+                onValueChange = uiState.onEmailChange,
+                label = stringResource(R.string.e_mail),
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Email,
                 isPassword = false
             )
             BookScapeTextField(
-                value = state.password,
-                onValueChange = state.onPasswordChange,
-                label = "Password",
+                value = uiState.password,
+                onValueChange = uiState.onPasswordChange,
+                label = stringResource(R.string.password),
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Password,
                 isPassword = true
@@ -149,21 +149,20 @@ fun SignInScreenContent(
                 onClick = { authAndShowToasts() },
                 content = {
                     Text(
-                        text = "Sign In",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
-                        fontSize = 18.sp
+                        text = stringResource(R.string.sign_in),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             )
             Row {
                 Text(
-                    text = "Don't have an account? ",
-                    fontSize = 15.sp
+                    text = stringResource(R.string.don_t_have_an_account),
+                    style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = "Sign up",
-                    fontSize = 15.sp,
+                    text = stringResource(R.string.sign_up),
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.onSecondaryContainer)
@@ -177,13 +176,28 @@ fun SignInScreenContent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-private fun SignInScreenPreview() {
-    SignInScreenContent(
-        state = sampleSignInState,
-        authAndShowToasts = {},
-        navigate = {},
-        resetSignInMessage = {}
-    )
+private fun SignInScreenLightThemePreview() {
+    BookScapeComposeTheme {
+        SignInScreenContent(
+            uiState = sampleSignInState,
+            authAndShowToasts = {},
+            navigate = {},
+            resetSignInMessage = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SignInScreenDarkThemePreview() {
+    BookScapeComposeTheme {
+        SignInScreenContent(
+            uiState = sampleSignInState,
+            authAndShowToasts = {},
+            navigate = {},
+            resetSignInMessage = {}
+        )
+    }
 }

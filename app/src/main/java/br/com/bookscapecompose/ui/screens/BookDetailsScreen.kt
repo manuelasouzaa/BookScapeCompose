@@ -22,6 +22,7 @@ import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleBook
 import br.com.bookscapecompose.ui.components.BookDetails
 import br.com.bookscapecompose.ui.components.BookScapeAlertDialog
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.viewmodels.BookDetailsViewModel
 import br.com.bookscapecompose.ui.viewmodels.BookMessage
 
@@ -111,29 +112,33 @@ fun BookDetailsScreenContent(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun BookDetailsScreenPreview() {
-    BookDetailsScreenContent(
-        answer = sampleBook,
-        icon = R.drawable.ic_add,
-        returnClick = {},
-        saveBook = {},
-        openDialog = remember { mutableStateOf(false) },
-        uriHandler = LocalUriHandler.current,
-        navigate = {},
-        toastMessage = {}
-    )
+    BookScapeComposeTheme {
+        BookDetailsScreenContent(
+            answer = sampleBook,
+            icon = R.drawable.ic_add,
+            returnClick = {},
+            saveBook = {},
+            openDialog = remember { mutableStateOf(false) },
+            uriHandler = LocalUriHandler.current,
+            navigate = {},
+            toastMessage = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun BookDetailsScreenOpenDialogPreview() {
-    BookDetailsScreenContent(
-        answer = sampleBook,
-        icon = R.drawable.ic_added,
-        returnClick = {},
-        saveBook = {},
-        openDialog = remember { mutableStateOf(true) },
-        uriHandler = LocalUriHandler.current,
-        navigate = {},
-        toastMessage = {}
-    )
+    BookScapeComposeTheme {
+        BookDetailsScreenContent(
+            answer = sampleBook,
+            icon = R.drawable.ic_added,
+            returnClick = {},
+            saveBook = {},
+            openDialog = remember { mutableStateOf(true) },
+            uriHandler = LocalUriHandler.current,
+            navigate = {},
+            toastMessage = {}
+        )
+    }
 }

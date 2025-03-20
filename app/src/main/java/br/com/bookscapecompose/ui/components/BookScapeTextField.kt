@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -7,11 +8,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 
 @Composable
 fun BookScapeTextField(
@@ -30,7 +31,7 @@ fun BookScapeTextField(
         label = {
             Text(
                 text = label,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.labelSmall
             )
         },
         modifier = modifier,
@@ -45,10 +46,94 @@ fun BookScapeTextField(
             unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
             cursorColor = MaterialTheme.colorScheme.onPrimary,
         ),
-        textStyle = TextStyle(
-            fontSize = 20.sp
-        ),
+        textStyle = MaterialTheme.typography.bodySmall,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
     )
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun BookScapeEmptyTextFieldLightModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = true
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun BookScapeFilledTextFieldLightModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "test",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = false
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun BookScapePasswordTextFieldLightModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "test",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = true
+        )
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapeEmptyTextFieldDarkModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = true
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapeFilledTextFieldDarkModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "test",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = false
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapePasswordTextFieldDarkModePreview() {
+    BookScapeComposeTheme {
+        BookScapeTextField(
+            value = "test",
+            onValueChange = {},
+            label = "Test",
+            keyboardType = KeyboardType.Text,
+            isPassword = true
+        )
+    }
 }

@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,17 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.bookscapecompose.R
 import br.com.bookscapecompose.expressions.toast
 import br.com.bookscapecompose.sampledata.sampleMainUiState
 import br.com.bookscapecompose.ui.components.BookScapeIconTextField
 import br.com.bookscapecompose.ui.components.PersonalizedButton
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 import br.com.bookscapecompose.ui.uistate.MainScreenUiState
 import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import br.com.bookscapecompose.ui.viewmodels.MainViewModel
@@ -78,7 +77,6 @@ fun MainScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -93,16 +91,17 @@ fun MainScreenContent(
                 modifier = Modifier.fillMaxWidth(.7f),
             )
             Text(
-                text = stringResource(R.string.bookscape),
-                fontSize = 28.sp,
+                text = stringResource(R.string.book_scape),
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(16.dp),
-                fontFamily = FontFamily(listOf(Font(R.font.kavoon))),
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
 
         BookScapeIconTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             searchText = state.searchText,
             onSearchChange = state.onSearchChange,
             onClick = {
@@ -133,22 +132,52 @@ fun MainScreenContent(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun MainScreenPreview() {
-    MainScreenContent(
-        state = sampleMainUiState,
-        navigate = {},
-        searchBooks = {},
-        isLoading = false
-    )
+private fun MainScreenLightThemePreview() {
+    BookScapeComposeTheme {
+        MainScreenContent(
+            state = sampleMainUiState,
+            navigate = {},
+            searchBooks = {},
+            isLoading = false
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun MainScreenLoadingPreview() {
-    MainScreenContent(
-        state = sampleMainUiState,
-        navigate = {},
-        searchBooks = {},
-        isLoading = true
-    )
+private fun MainScreenLoadingLightThemePreview() {
+    BookScapeComposeTheme {
+        MainScreenContent(
+            state = sampleMainUiState,
+            navigate = {},
+            searchBooks = {},
+            isLoading = true
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MainScreenDarkThemePreview() {
+    BookScapeComposeTheme {
+        MainScreenContent(
+            state = sampleMainUiState,
+            navigate = {},
+            searchBooks = {},
+            isLoading = false
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MainScreenLoadingDarkThemePreview() {
+    BookScapeComposeTheme {
+        MainScreenContent(
+            state = sampleMainUiState,
+            navigate = {},
+            searchBooks = {},
+            isLoading = true
+        )
+    }
 }

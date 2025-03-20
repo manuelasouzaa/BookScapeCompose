@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,15 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleList
+import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
 
 @Composable
 fun BookScapeList(
@@ -40,12 +38,13 @@ fun BookScapeList(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -60,8 +59,7 @@ fun BookScapeList(
 
             Text(
                 text = title,
-                fontSize = 28.sp,
-                fontFamily = FontFamily((listOf(Font(R.font.kavoon)))),
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
@@ -69,12 +67,17 @@ fun BookScapeList(
         }
 
         if (list.isEmpty()) {
-            Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = "No books here yet!\nBegin adding your favorites now.",
-                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
+                    modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -85,7 +88,7 @@ fun BookScapeList(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
                 items(list) { bookItem ->
                     bookItem?.let { book ->
@@ -99,22 +102,52 @@ fun BookScapeList(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun BookScapeListPreview() {
-    BookScapeList(
-        returnClick = {},
-        title = "List",
-        list = sampleList,
-        onClick = {}
-    )
+private fun BookScapeListLightModePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "List",
+            list = sampleList,
+            onClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun BookScapeEmptyListPreview() {
-    BookScapeList(
-        returnClick = {},
-        title = "List",
-        list = emptyList(),
-        onClick = {}
-    )
+private fun BookScapeEmptyListLightModePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "List",
+            list = emptyList(),
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapeListDarkModePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "List",
+            list = sampleList,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BookScapeEmptyListDarkModePreview() {
+    BookScapeComposeTheme {
+        BookScapeList(
+            returnClick = {},
+            title = "List",
+            list = emptyList(),
+            onClick = {}
+        )
+    }
 }

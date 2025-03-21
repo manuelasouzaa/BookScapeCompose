@@ -69,7 +69,7 @@ fun SavedBookDetailsScreen(viewModel: SavedBookDetailsViewModel, navController: 
 
     fun saveBook() = { viewModel.saveBook() }
 
-    fun deleteBook() = { viewModel.deleteBook() }
+    fun deleteBook() = viewModel.deleteBook()
 
     SavedBookDetailsScreenContent(
         answer = answer,

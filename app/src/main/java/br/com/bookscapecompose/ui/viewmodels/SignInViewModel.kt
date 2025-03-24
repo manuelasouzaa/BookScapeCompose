@@ -22,9 +22,6 @@ class SignInViewModel(private val userRepository: UserRepository) : ViewModel() 
     val signInMessage = _signInMessage.asStateFlow()
 
     init {
-        viewModelScope.launch(IO) {
-            _signInMessage.emit(SignInMessage.Initial)
-        }
         _uiState.update { currentState ->
             currentState.copy(
                 onEmailChange = {
@@ -43,19 +40,24 @@ class SignInViewModel(private val userRepository: UserRepository) : ViewModel() 
 
     fun authenticate(email: String, password: String): SignInMessage {
         viewModelScope.launch {
+
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 withContext(IO) {
                     val verification = verifyIfUserExists()
+
                     if (verification) {
                         val auth = auth(email, password)
-                        if (auth)
+                        if (auth) {
                             userRepository.login(email)
+                            clearSignInMessage()
+                        }
                     } else {
                         _signInMessage.emit(SignInMessage.UserDoesNotExist)
                     }
                 }
             } else
                 _signInMessage.emit(SignInMessage.MissingInformation)
+
         }
         return signInMessage.value
     }

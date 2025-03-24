@@ -129,7 +129,7 @@ fun SignUpScreenContent(
             BookScapeTextField(
                 value = uiState.email,
                 onValueChange = uiState.onEmailChange,
-                label = "E-mail",
+                label = stringResource(R.string.e_mail),
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Email,
                 isPassword = false
@@ -137,7 +137,7 @@ fun SignUpScreenContent(
             BookScapeTextField(
                 value = uiState.username,
                 onValueChange = uiState.onUsernameChange,
-                label = "Username",
+                label = stringResource(R.string.username),
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Text,
                 isPassword = false
@@ -145,7 +145,7 @@ fun SignUpScreenContent(
             BookScapeTextField(
                 value = uiState.password,
                 onValueChange = uiState.onPasswordChange,
-                label = "Password",
+                label = stringResource(R.string.password),
                 modifier = Modifier.fillMaxWidth(.9f),
                 keyboardType = KeyboardType.Password,
                 isPassword = true
@@ -154,7 +154,7 @@ fun SignUpScreenContent(
                 onClick = { showToasts() },
                 content = {
                     Text(
-                        text = "Sign Up",
+                        text = stringResource(R.string.sign_up),
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -162,11 +162,11 @@ fun SignUpScreenContent(
             )
             Row {
                 Text(
-                    text = "Already have an account? ",
+                    text = stringResource(R.string.already_have_an_account),
                     style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = "Sign in",
+                    text = stringResource(R.string.sign_in),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier

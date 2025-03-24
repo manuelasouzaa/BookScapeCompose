@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import br.com.bookscapecompose.R
 import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookScapeList
 import br.com.bookscapecompose.ui.theme.BookScapeComposeTheme
@@ -25,7 +27,7 @@ fun SearchScreen(viewModel: SearchViewModel, navController: NavController) {
     if (list.value.isNotEmpty()) {
         BookScapeList(
             returnClick = { returnToMainScreen() },
-            title = "Found books",
+            title = stringResource(R.string.found_books),
             list = list.value,
             onClick = {
                 viewModel.sendBook(it)
@@ -42,7 +44,7 @@ private fun SearchScreenLightThemePreview() {
     BookScapeComposeTheme {
         BookScapeList(
             returnClick = {},
-            title = "Found books",
+            title = stringResource(R.string.found_books),
             list = sampleList,
             onClick = {}
         )
@@ -55,7 +57,7 @@ private fun SearchScreenDarkThemePreview() {
     BookScapeComposeTheme {
         BookScapeList(
             returnClick = {},
-            title = "Found books",
+            title = stringResource(R.string.found_books),
             list = sampleList,
             onClick = {}
         )

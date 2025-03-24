@@ -49,11 +49,14 @@ fun MainScreen(viewModel: MainViewModel, navController: NavController) {
 
     LaunchedEffect(googleApiAnswer) {
         when (googleApiAnswer) {
-            ApiAnswer.EmptyList -> toast(context, "Book not found")
+            ApiAnswer.EmptyList ->
+                toast(context, context.getString(R.string.book_not_found))
 
-            ApiAnswer.Success -> navController.navigate("SearchScreen")
+            ApiAnswer.Success ->
+                navController.navigate("SearchScreen")
 
-            ApiAnswer.Error -> toast(context, "Something went wrong. Try again")
+            ApiAnswer.Error ->
+                toast(context, context.getString(R.string.something_went_wrong_try_again))
 
             else -> {}
         }

@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.User
 import br.com.bookscapecompose.sampledata.sampleUser
 import br.com.bookscapecompose.ui.components.PersonalizedButton
@@ -56,7 +58,7 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
 
     viewModel.account()
 
-    fun logout() {
+    fun logout() = {
         viewModel.logout()
     }
 
@@ -64,7 +66,7 @@ fun AccountScreen(viewModel: AccountViewModel, navController: NavController) {
         isLoading = isLoading,
         user = user,
         returnClick = { navController.navigateUp() },
-        logout = { logout() },
+        logout = logout(),
         navigate = { navController.navigate(it) }
     )
 }
@@ -167,7 +169,7 @@ fun AccountScreenContent(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "E-mail",
+                            text = stringResource(R.string.e_mail),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground,
@@ -200,10 +202,10 @@ fun AccountScreenContent(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth(.5f)
-                                .padding(top = 21.dp, bottom = 21.dp),
+                                .padding(vertical = 21.dp),
                         ) {
                             Text(
-                                text = "My BookList",
+                                text = stringResource(R.string.my_book_list),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(5.dp)
@@ -215,7 +217,7 @@ fun AccountScreenContent(
                                 .fillMaxWidth(.5f)
                                 .padding(top = 5.dp),
                             onClick = { logout() },
-                            text = "Logout",
+                            text = stringResource(R.string.logout),
                             imageVector = Icons.Default.ExitToApp
                         )
                     }

@@ -1,5 +1,6 @@
 package br.com.bookscapecompose.ui.screens
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,7 +56,7 @@ fun BookDetailsScreen(viewModel: BookDetailsViewModel, navController: NavControl
         openDialog = openDialog,
         uriHandler = uriHandler,
         navigate = { navController.navigate(it) },
-        toastMessage = { toast(context, it) }
+        context
     )
 }
 
@@ -68,7 +69,7 @@ fun BookDetailsScreenContent(
     openDialog: MutableState<Boolean>,
     uriHandler: UriHandler,
     navigate: (String) -> Unit,
-    toastMessage: (String) -> Unit,
+    context: Context,
 ) {
     answer?.let {
         BookDetails(
@@ -81,7 +82,7 @@ fun BookDetailsScreenContent(
                     openDialog.value = true
                 }
                 if (icon == R.drawable.ic_added)
-                    toastMessage("This book is already on your list!")
+                    toast(context, context.getString(R.string.book_already_saved))
             },
             bookTitle = answer.title,
             bookAuthors = answer.authors ?: "",
@@ -121,7 +122,7 @@ private fun BookDetailsScreenPreview() {
             openDialog = remember { mutableStateOf(false) },
             uriHandler = LocalUriHandler.current,
             navigate = {},
-            toastMessage = {}
+            context = LocalContext.current
         )
     }
 }
@@ -138,7 +139,7 @@ private fun BookDetailsScreenOpenDialogPreview() {
             openDialog = remember { mutableStateOf(true) },
             uriHandler = LocalUriHandler.current,
             navigate = {},
-            toastMessage = {}
+            context = LocalContext.current
         )
     }
 }

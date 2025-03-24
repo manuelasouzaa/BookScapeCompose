@@ -46,7 +46,11 @@ fun SignInScreen(viewModel: SignInViewModel, navController: NavController) {
     val uiState by viewModel.uiState.collectAsState()
     val signInMessage by viewModel.signInMessage.collectAsState()
 
-    fun validateAndShowToasts() {
+    fun clearSignInMessage() = {
+        viewModel.clearSignInMessage()
+    }
+
+    fun validateAndShowToasts(): () -> Unit = {
         if (uiState.email.isEmpty() || uiState.password.isEmpty()) {
             toast(context, context.getString(R.string.missing_fields))
         } else {
@@ -56,6 +60,8 @@ fun SignInScreen(viewModel: SignInViewModel, navController: NavController) {
 
     LaunchedEffect(signInMessage) {
         when (signInMessage) {
+            SignInMessage.Initial -> {}
+
             SignInMessage.UserLoggedIn -> {
                 toast(context, context.getString(R.string.logged_in))
                 navController.navigate("MainScreen")
@@ -73,17 +79,14 @@ fun SignInScreen(viewModel: SignInViewModel, navController: NavController) {
             SignInMessage.UserDoesNotExist ->
                 toast(context, context.getString(R.string.user_not_found))
 
-            SignInMessage.Initial -> {}
         }
     }
 
-    fun clearSignInMessage() = { viewModel.clearSignInMessage() }
-
     SignInScreenContent(
         uiState = uiState,
-        authAndShowToasts = { validateAndShowToasts() },
+        authAndShowToasts = validateAndShowToasts(),
         navigate = { navController.navigate(it) },
-        resetSignInMessage = { clearSignInMessage() }
+        resetSignInMessage = clearSignInMessage()
     )
 }
 
@@ -125,7 +128,7 @@ fun SignInScreenContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.sign_in),
+                text = stringResource(R.string.sign_in_title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -149,7 +152,7 @@ fun SignInScreenContent(
                 onClick = { authAndShowToasts() },
                 content = {
                     Text(
-                        text = stringResource(R.string.sign_in),
+                        text = stringResource(R.string.sign_in_title),
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )

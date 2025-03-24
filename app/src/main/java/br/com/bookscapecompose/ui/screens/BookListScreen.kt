@@ -13,8 +13,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import br.com.bookscapecompose.R
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.sampledata.sampleList
 import br.com.bookscapecompose.ui.components.BookScapeList
@@ -65,7 +67,7 @@ fun BookListScreenContent(
     if (!loading)
         BookScapeList(
             returnClick = { returnClick() },
-            title = "My BookList",
+            title = stringResource(R.string.my_booklist),
             list = books,
             onClick = {
                 onItemClick(it)

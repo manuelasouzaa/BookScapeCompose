@@ -4,8 +4,8 @@ import android.content.Context
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
-import br.com.bookscapecompose.ui.navigation.UserPreferences
 import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
+import br.com.bookscapecompose.ui.viewmodels.RootViewModel
 import br.com.bookscapecompose.web.json.GoogleApiAnswer
 import br.com.bookscapecompose.web.retrofit.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 
-class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookRepository {
+class BookRepositoryImpl(rootViewModel: RootViewModel, context: Context) : BookRepository {
 
     private val bookDao = BookScapeDatabase.getDatabaseInstance(context).SavedBookDao()
     private val service by lazy { RetrofitInstance.api }
-    override val userEmail = preferences.userEmail
+    override val userPreferences = rootViewModel.userPreferences()
 
     private val _foundBooks: MutableStateFlow<List<Book?>> = MutableStateFlow(emptyList())
     override val foundBooks = _foundBooks.asStateFlow()
@@ -65,13 +65,13 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
     override suspend fun verifyIfBookIsSaved(): Boolean {
         return clickedBook.value?.let { clickedBook ->
             verification(clickedBook)
-        } ?: false
+        } == true
     }
 
     private suspend fun verification(clickedBook: Book): Boolean {
         var existentBook: SavedBook? = null
 
-        userEmail.first()?.let { userEmail ->
+        userPreferences.first().loggedUserEmail?.let { userEmail ->
             existentBook = if (userEmail != "") {
                 bookDao.verifyIfBookIsSaved(clickedBook.id, userEmail)
             } else null
@@ -81,7 +81,7 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
     }
 
     override suspend fun saveBook(): Boolean {
-        return userEmail.first()?.let { userEmail ->
+        return userPreferences.first().loggedUserEmail?.let { userEmail ->
             clickedBook.value?.let { book ->
                 val savedBook = SavedBook(
                     savedBookId = UUID.randomUUID().toString(),
@@ -96,7 +96,7 @@ class BookRepositoryImpl(preferences: UserPreferences, context: Context) : BookR
                 bookDao.saveBook(savedBook)
             }
             true
-        } ?: false
+        } == true
     }
 
     override suspend fun sendBook(book: Book) {

@@ -1,11 +1,13 @@
 package br.com.bookscapecompose.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import br.com.bookscapecompose.ui.screens.AccountScreen
 import br.com.bookscapecompose.ui.screens.BookDetailsScreen
 import br.com.bookscapecompose.ui.screens.BookListScreen
@@ -14,19 +16,26 @@ import br.com.bookscapecompose.ui.screens.SavedBookDetailsScreen
 import br.com.bookscapecompose.ui.screens.SearchScreen
 import br.com.bookscapecompose.ui.screens.SignInScreen
 import br.com.bookscapecompose.ui.screens.SignUpScreen
+import br.com.bookscapecompose.ui.screens.SplashScreen
 import br.com.bookscapecompose.ui.viewmodels.AccountViewModel
 import br.com.bookscapecompose.ui.viewmodels.BookDetailsViewModel
 import br.com.bookscapecompose.ui.viewmodels.BookListViewModel
 import br.com.bookscapecompose.ui.viewmodels.MainViewModel
+import br.com.bookscapecompose.ui.viewmodels.AppState
+import br.com.bookscapecompose.ui.viewmodels.RootViewModel
 import br.com.bookscapecompose.ui.viewmodels.SavedBookDetailsViewModel
 import br.com.bookscapecompose.ui.viewmodels.SearchViewModel
 import br.com.bookscapecompose.ui.viewmodels.SignInViewModel
 import br.com.bookscapecompose.ui.viewmodels.SignUpViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
 @Composable
 fun BookScapeNavHost(navController: NavHostController) {
+
+    val rootViewModel = koinViewModel<RootViewModel>()
+    LaunchedEffect(rootViewModel) {
+        rootViewModel.preferencesState()
+    }
 
     val signUpViewModel = koinViewModel<SignUpViewModel>()
     val signInViewModel = koinViewModel<SignInViewModel>()
@@ -37,20 +46,21 @@ fun BookScapeNavHost(navController: NavHostController) {
     val bookDetailsViewModel = koinViewModel<BookDetailsViewModel>()
     val savedBookDetailsViewModel = koinViewModel<SavedBookDetailsViewModel>()
 
-    val preferences: UserPreferences = koinInject()
+    val loadedPreferences by rootViewModel.appState.collectAsState()
 
-    val state by preferences.state.collectAsState(false)
-    val email by preferences.userEmail.collectAsState(null)
+    val startDestination = when (loadedPreferences) {
+        AppState.Logged ->
+            "MainScreen"
 
-    val startDestination = if (state == false || email == "") {
-        "SignInScreen"
-    } else if (state == true) {
-        "MainScreen"
-    } else {
-        "SignInScreen"
+        AppState.NotLogged ->
+            "SignInScreen"
+
+        else ->
+            "SplashScreen"
     }
 
     NavHost(navController = navController, startDestination = startDestination) {
+
         composable("SignUpScreen") {
             SignUpScreen(signUpViewModel, navController)
         }
@@ -75,8 +85,29 @@ fun BookScapeNavHost(navController: NavHostController) {
         composable("BookListScreen") {
             BookListScreen(bookListViewModel, navController)
         }
+        composable("SplashScreen") {
+            SplashScreen()
+        }
+
     }
 
-    if (state == false || email == "")
-        navController.navigate("SignInScreen")
+    LaunchedEffect(loadedPreferences) {
+        when (loadedPreferences) {
+            AppState.NotLogged -> {
+                navController.navigate("SignInScreen", navOptions {
+                    popUpTo("SplashScreen") { inclusive = true }
+                    launchSingleTop = true
+                })
+            }
+
+            AppState.Logged -> {
+                navController.navigate("MainScreen", navOptions {
+                    popUpTo("SplashScreen") { inclusive = true }
+                    launchSingleTop = true
+                })
+            }
+
+            else -> {}
+        }
+    }
 }

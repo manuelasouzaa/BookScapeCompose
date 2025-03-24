@@ -1,22 +1,22 @@
 package br.com.bookscapecompose.ui.repositories
 
 import android.content.Context
+import android.util.Log
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.Book
 import br.com.bookscapecompose.model.SavedBook
-import br.com.bookscapecompose.ui.navigation.UserPreferences
+import br.com.bookscapecompose.ui.viewmodels.RootViewModel
 import br.com.bookscapecompose.ui.viewmodels.SavedBookMessage
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 
-class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context) :
+class SavedBookRepositoryImpl(rootViewModel: RootViewModel, context: Context) :
     SavedBookRepository {
 
     private val bookDao = BookScapeDatabase.getDatabaseInstance(context).SavedBookDao()
-    override val userEmail: Flow<String?> = userPreferences.userEmail
+    override val userPreferences = rootViewModel.userPreferences()
 
     private val _clickedBook: MutableStateFlow<Book?> = MutableStateFlow(null)
     override val clickedBook = _clickedBook.asStateFlow()
@@ -33,7 +33,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
     }
 
     override suspend fun showBooks(): List<Book?> {
-        userEmail.first()?.let { email ->
+        userPreferences.first().loggedUserEmail?.let { email ->
             val formattedList = formattingList(bookDao.showSavedBooks(email))
             _bookList.emit(formattedList)
             return formattedList
@@ -56,7 +56,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
     }
 
     override suspend fun deleteBook() {
-        userEmail.first()?.let { userEmail ->
+        userPreferences.first().loggedUserEmail?.let { userEmail ->
             clickedBook.value?.let { book ->
                 val savedBook = fetchBook(book.id, userEmail)
                 try {
@@ -64,6 +64,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
                     _savedBookMessage.emit(SavedBookMessage.DeletedBook)
                 } catch (e: Exception) {
                     _savedBookMessage.emit(SavedBookMessage.Error)
+                    Log.e("TAG", "deleteBook: Error when trying to delete book", e)
                 }
             }
         }
@@ -71,7 +72,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
 
     override suspend fun verifyIfBookIsSaved() {
         clickedBook.value?.let { clickedBook ->
-            userEmail.first()?.let { userEmail ->
+            userPreferences.first().loggedUserEmail?.let { userEmail ->
                 val isBookSaved = verification(clickedBook, userEmail)
                 if (!isBookSaved && savedBookMessage.value != SavedBookMessage.DeletedBook)
                     _savedBookMessage.emit(SavedBookMessage.Error)
@@ -97,7 +98,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
     }
 
     override suspend fun saveBook() {
-        userEmail.first()?.let { userEmail ->
+        userPreferences.first().loggedUserEmail?.let { userEmail ->
             clickedBook.value?.let { book ->
                 val savedBook = SavedBook(
                     savedBookId = UUID.randomUUID().toString(),
@@ -114,6 +115,7 @@ class SavedBookRepositoryImpl(userPreferences: UserPreferences, context: Context
                     _savedBookMessage.emit(SavedBookMessage.AddedBook)
                 } catch (e: Exception) {
                     _savedBookMessage.emit(SavedBookMessage.Error)
+                    Log.e("TAG", "saveBook: Error when trying to save book", e)
                 }
             }
         }

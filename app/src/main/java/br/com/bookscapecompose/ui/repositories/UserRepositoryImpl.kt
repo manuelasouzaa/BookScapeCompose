@@ -3,14 +3,15 @@ package br.com.bookscapecompose.ui.repositories
 import android.content.Context
 import br.com.bookscapecompose.database.BookScapeDatabase
 import br.com.bookscapecompose.model.User
-import br.com.bookscapecompose.ui.navigation.UserPreferences
+import br.com.bookscapecompose.preferences.UserConfig
+import br.com.bookscapecompose.ui.viewmodels.RootViewModel
 import kotlinx.coroutines.flow.first
 
-class UserRepositoryImpl(private val preferences: UserPreferences, context: Context) :
+class UserRepositoryImpl(private val rootViewModel: RootViewModel, context: Context) :
     UserRepository {
 
     private val userDao = BookScapeDatabase.getDatabaseInstance(context).UserDao()
-    private val userEmail = preferences.userEmail
+    override val userPreferences = rootViewModel.userPreferences()
 
     override fun addUser(user: User) {
         userDao.saveUser(user)
@@ -21,8 +22,8 @@ class UserRepositoryImpl(private val preferences: UserPreferences, context: Cont
     }
 
     override suspend fun fetchUserByEmailPreference(): User? {
-        return userEmail.first()?.let { email ->
-            userDao.fetchUserByEmail(email)
+        return userPreferences.first().loggedUserEmail?.let { userEmail ->
+            userDao.fetchUserByEmail(userEmail)
         }
     }
 
@@ -31,11 +32,12 @@ class UserRepositoryImpl(private val preferences: UserPreferences, context: Cont
     }
 
     override suspend fun login(email: String) {
-        preferences.updateUserEmail(email)
-        preferences.updateLoggedState(true)
+        rootViewModel.updateUserPreferences(
+            UserConfig(loggedUserEmail = email, loggedUserState = true)
+        )
     }
 
     override suspend fun logout() {
-        preferences.logout()
+        rootViewModel.logout()
     }
 }

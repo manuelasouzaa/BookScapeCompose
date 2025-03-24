@@ -1,6 +1,7 @@
 package br.com.bookscapecompose.ui.repositories
 
 import br.com.bookscapecompose.model.Book
+import br.com.bookscapecompose.preferences.UserConfig
 import br.com.bookscapecompose.ui.viewmodels.ApiAnswer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +11,7 @@ interface BookRepository {
     val foundBooks: StateFlow<List<Book?>>
     val clickedBook: StateFlow<Book?>
     val apiAnswer: StateFlow<ApiAnswer>
-    val userEmail: Flow<String?>
+    val userPreferences: Flow<UserConfig>
 
     suspend fun verifyApiAnswer(searchText: String): List<Book?>?
 

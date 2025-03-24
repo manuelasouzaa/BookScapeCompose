@@ -67,17 +67,17 @@ fun SavedBookDetailsScreen(viewModel: SavedBookDetailsViewModel, navController: 
         }
     }
 
-    fun saveBook() = viewModel.saveBook()
+    fun saveBook() = { viewModel.saveBook() }
 
-    fun deleteBook() = viewModel.deleteBook()
+    fun deleteBook() = { viewModel.deleteBook() }
 
     SavedBookDetailsScreenContent(
         answer = answer,
         returnClick = { navController.navigateUp() },
         icon = bookmarkIcon,
         openDialog = openDialog,
-        addBook = { saveBook() },
-        deleteBook = { deleteBook() },
+        addBook = saveBook(),
+        deleteBook = deleteBook(),
         uriHandler = uriHandler,
         navigate = { navController.navigate(it) }
     )
@@ -116,7 +116,7 @@ fun SavedBookDetailsScreenContent(
         BookScapeAlertDialog(
             buttonModifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 70.dp),
+                .padding(horizontal = 50.dp),
             onDismissRequest = { openDialog.value = false },
             onConfirmClick = {
                 deleteBook()

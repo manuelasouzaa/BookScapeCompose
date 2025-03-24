@@ -27,7 +27,7 @@ fun BookScapeButton(
     ) {
         Text(
             text = buttonText,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(5.dp)
         )
